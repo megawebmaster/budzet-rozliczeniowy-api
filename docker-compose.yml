@@ -1,0 +1,20 @@
+version: '2'
+services:
+  db:
+    image: postgres:10-alpine
+    environment:
+      POSTGRES_PASSWORD: example
+      POSTGRES_DB: budzet
+  app:
+    build:
+      context: '.'
+      args:
+        host_uid: $HOST_UID
+    links:
+      - db
+    ports:
+      - "8080:8080"
+    volumes:
+      - .:/app
+    command: 'php bin/console server:run 0.0.0.0:8080'
+
