@@ -41,6 +41,13 @@ class CategoryConverter implements ParamConverterInterface
 
     if(!$object)
     {
+      if($configuration->isOptional())
+      {
+        $request->attributes->set($name, null);
+
+        return true;
+      }
+
       return false;
     }
 

@@ -35,7 +35,11 @@ class BudgetController extends Controller
 
     if (!$budget)
     {
-      $repository->create($year);
+      $budget = new Budget();
+      $budget->setName('budget');
+      $budget->setYear($year);
+      $this->getDoctrine()->getManager()->persist($budget);
+      $this->getDoctrine()->getManager()->flush();
     }
 
     return $this->json($budget, 200, [], ['groups' => ['budget']]);
