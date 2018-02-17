@@ -5,12 +5,15 @@ namespace App\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Mapping\Annotation as Gedmo;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\CategoryRepository")
+ * @ORM\HasLifecycleCallbacks()
+ * @Gedmo\SoftDeleteable(fieldName="deletedAt")
  * @UniqueEntity(fields={"name", "type"})
  */
 class Category
@@ -55,13 +58,38 @@ class Category
    */
   private $subcategories;
 
-  public static function getTypes(): array {
+  /**
+   * @var \DateTime Creation time.
+   * @ORM\Column(type="datetime")
+   * @Groups("category")
+   */
+  private $createdAt;
+
+  /**
+   * @var \DateTime Deletion time.
+   * @ORM\Column(type="datetime", nullable=true)
+   * @Groups("category")
+   */
+  private $deletedAt;
+
+  public static function getTypes(): array
+  {
     return self::TYPES;
   }
 
   public function __construct()
   {
     $this->subcategories = new ArrayCollection();
+  }
+
+  /**
+   * Triggered on insert
+   *
+   * @ORM\PrePersist
+   */
+  public function onPrePersist()
+  {
+    $this->createdAt = new \DateTime("now");
   }
 
   /**
@@ -126,5 +154,21 @@ class Category
   public function setParent(Category $parent): void
   {
     $this->parent = $parent;
+  }
+
+  /**
+   * @return \DateTime
+   */
+  public function getCreatedAt(): \DateTime
+  {
+    return $this->createdAt;
+  }
+
+  /**
+   * @return \DateTime
+   */
+  public function getDeletedAt(): ?\DateTime
+  {
+    return $this->deletedAt;
   }
 }
