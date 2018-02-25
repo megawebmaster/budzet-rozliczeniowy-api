@@ -65,6 +65,13 @@ class Category
   private $createdAt;
 
   /**
+   * @var \DateTime Start time.
+   * @ORM\Column(type="datetime")
+   * @Groups("category")
+   */
+  private $startedAt;
+
+  /**
    * @var \DateTime Deletion time.
    * @ORM\Column(type="datetime", nullable=true)
    * @Groups("category")
@@ -166,6 +173,22 @@ class Category
   /**
    * @return \DateTime
    */
+  public function getStartedAt(): ?\DateTime
+  {
+    return $this->startedAt;
+  }
+
+  /**
+   * @param \DateTime $startedAt
+   */
+  public function setStartedAt(\DateTime $startedAt): void
+  {
+    $this->startedAt = $startedAt;
+  }
+
+  /**
+   * @return \DateTime
+   */
   public function getDeletedAt(): ?\DateTime
   {
     return $this->deletedAt;
@@ -174,13 +197,8 @@ class Category
   /**
    * @param \DateTime $deletedAt
    */
-  public function setDeletedAt(\DateTime $deletedAt): void
+  public function setDeletedAt(?\DateTime $deletedAt): void
   {
     $this->deletedAt = $deletedAt;
-  }
-
-  public function isDeleted(): bool
-  {
-    return $this->deletedAt != null;
   }
 }

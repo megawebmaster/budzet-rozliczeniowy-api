@@ -31,11 +31,22 @@ class CategoryController extends FOSRestController
    */
   public function create(Request $request, ValidatorInterface $validator)
   {
-    $category = new Category();
+    $category = $this->getRepository()->findOneByOrNew([
+      'name' => $request->get('name'),
+      'type' => $request->get('type')
+    ]);
+
     $category->setName($request->get('name'));
     $category->setType($request->get('type'));
+    $category->setDeletedAt(null);
 
-    $parentId = $request->get('parent_id', null);
+    $startedAt = new \DateTime($request->get('year').'-'.$request->get('month', '01').'-01');
+    if(!$category->getStartedAt() || $category->getStartedAt() > $startedAt)
+    {
+      $category->setStartedAt($startedAt);
+    }
+
+    $parentId = $request->get('parent_id');
     if($parentId)
     {
       /** @var Category $parent */
@@ -47,6 +58,7 @@ class CategoryController extends FOSRestController
 
     if(count($errors) > 0)
     {
+      dump($errors);
       return $this->json($errors);
     }
 
@@ -86,16 +98,12 @@ class CategoryController extends FOSRestController
   /**
    * @Route("/categories/{category_id}", methods={"DELETE"}, name="delete_category")
    * @param Category $category
+   * @param Request $request
    * @return Response
    */
-  public function delete(Category $category)
+  public function delete(Category $category, Request $request)
   {
-    if($category->isDeleted())
-    {
-      throw $this->createNotFoundException();
-    }
-
-    $category->setDeletedAt(new \DateTime());
+    $category->setDeletedAt(new \DateTime($request->get('year').'-'.$request->get('month', '01').'-01'));
     $this->getDoctrine()->getManager()->persist($category);
     $this->getDoctrine()->getManager()->flush();
 
