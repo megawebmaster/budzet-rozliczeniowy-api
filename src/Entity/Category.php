@@ -13,7 +13,6 @@ use Symfony\Component\Validator\Constraints as Assert;
 /**
  * @ORM\Entity(repositoryClass="App\Repository\CategoryRepository")
  * @ORM\HasLifecycleCallbacks()
- * @Gedmo\SoftDeleteable(fieldName="deletedAt")
  * @UniqueEntity(fields={"name", "type"})
  */
 class Category
@@ -170,5 +169,18 @@ class Category
   public function getDeletedAt(): ?\DateTime
   {
     return $this->deletedAt;
+  }
+
+  /**
+   * @param \DateTime $deletedAt
+   */
+  public function setDeletedAt(\DateTime $deletedAt): void
+  {
+    $this->deletedAt = $deletedAt;
+  }
+
+  public function isDeleted(): bool
+  {
+    return $this->deletedAt != null;
   }
 }

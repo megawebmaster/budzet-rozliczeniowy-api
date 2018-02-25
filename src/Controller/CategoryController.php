@@ -6,14 +6,14 @@ namespace App\Controller;
 use App\Entity\Category;
 use App\Repository\CategoryRepository;
 use Doctrine\Common\Persistence\ObjectRepository;
+use FOS\RestBundle\Controller\FOSRestController;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-class CategoryController extends Controller
+class CategoryController extends FOSRestController
 {
   /**
    * @Route("/categories", name="categories", methods={"GET"})
@@ -31,15 +31,22 @@ class CategoryController extends Controller
    */
   public function create(Request $request, ValidatorInterface $validator)
   {
-    /** @var Category $parent */
-    $parent = $this->getRepository()->find($request->get('parent_id'));
     $category = new Category();
     $category->setName($request->get('name'));
     $category->setType($request->get('type'));
-    $category->setParent($parent);
+
+    $parentId = $request->get('parent_id', null);
+    if($parentId)
+    {
+      /** @var Category $parent */
+      $parent = $this->getRepository()->find($parentId);
+      $category->setParent($parent);
+    }
+
     $errors = $validator->validate($category);
 
-    if (count($errors) > 0) {
+    if(count($errors) > 0)
+    {
       return $this->json($errors);
     }
 
@@ -58,13 +65,15 @@ class CategoryController extends Controller
    */
   public function update(Category $category, Request $request, ValidatorInterface $validator)
   {
-    if ($request->request->has('name'))
+    $name = $request->get('name');
+    if($name)
     {
-      $category->setName($request->get('name'));
+      $category->setName($name);
     }
     $errors = $validator->validate($category);
 
-    if (count($errors) > 0) {
+    if(count($errors) > 0)
+    {
       return $this->json($errors);
     }
 
@@ -81,7 +90,13 @@ class CategoryController extends Controller
    */
   public function delete(Category $category)
   {
-    $this->getDoctrine()->getManager()->remove($category);
+    if($category->isDeleted())
+    {
+      throw $this->createNotFoundException();
+    }
+
+    $category->setDeletedAt(new \DateTime());
+    $this->getDoctrine()->getManager()->persist($category);
     $this->getDoctrine()->getManager()->flush();
 
     return new Response();
