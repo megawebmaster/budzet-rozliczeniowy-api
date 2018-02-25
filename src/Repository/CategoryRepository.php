@@ -13,9 +13,9 @@ class CategoryRepository extends ServiceEntityRepository
     parent::__construct($registry, Category::class);
   }
 
-  public function findOneByOrNew(array $criteria, array $orderBy = null, $limit = null, $offset = null): Category
+  public function findOneByOrNew(array $criteria, array $orderBy = null): Category
   {
-    $category = $this->findOneBy($criteria, $orderBy, $limit, $offset);
+    $category = $this->findOneBy($criteria, $orderBy);
 
     if(!$category)
     {

@@ -8,21 +8,22 @@ use Symfony\Bridge\Doctrine\RegistryInterface;
 
 class BudgetEntryRepository extends ServiceEntityRepository
 {
-    public function __construct(RegistryInterface $registry)
+  public function __construct(RegistryInterface $registry)
+  {
+    parent::__construct($registry, BudgetEntry::class);
+  }
+
+  public function findOneByOrNew(array $criteria, array $orderBy = null): BudgetEntry
+  {
+    $entry = $this->findOneBy($criteria, $orderBy);
+
+    if(!$entry)
     {
-        parent::__construct($registry, BudgetEntry::class);
+      $entry = new BudgetEntry();
+      $entry->setPlan(0.0);
+      $entry->setReal(0.0);
     }
 
-    /*
-    public function findBySomething($value)
-    {
-        return $this->createQueryBuilder('b')
-            ->where('b.something = :value')->setParameter('value', $value)
-            ->orderBy('b.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
-        ;
-    }
-    */
+    return $entry;
+  }
 }

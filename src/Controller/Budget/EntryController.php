@@ -8,15 +8,15 @@ use App\Entity\BudgetEntry;
 use App\Entity\Category;
 use App\Repository\BudgetEntryRepository;
 use Doctrine\Common\Persistence\ObjectRepository;
+use FOS\RestBundle\Controller\FOSRestController;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-class EntryController extends Controller
+class EntryController extends FOSRestController
 {
   /**
    * @Route("/budgets/{year}/entries", methods={"GET"}, name="budget_entries", requirements={"year": "\d{4}"})
@@ -27,68 +27,69 @@ class EntryController extends Controller
   {
     $repository = $this->getRepository();
     $items = $repository->findBy(['budget' => $budget]);
+
     return $this->json($items, 200, [], ['groups' => ['entry']]);
   }
 
   /**
    * @Route(
-   *   "/budgets/{year}/entries",
-   *   methods={"POST"},
-   *   name="new_budget_entry",
+   *   "/budgets/{year}/entries/{month}",
+   *   methods={"GET"},
+   *   name="budget_month_entries",
+   *   requirements={"year": "\d{4}", "month": "\d\d?"})
+   * @param Budget $budget
+   * @return JsonResponse
+   */
+  public function month(Budget $budget, int $month)
+  {
+    $repository = $this->getRepository();
+    $items = $repository->findBy(['budget' => $budget, 'month' => $month]);
+
+    return $this->json($items, 200, [], ['groups' => ['entry']]);
+  }
+
+  /**
+   * @Route(
+   *   "/budgets/{year}/entries/{month}/{category_id}",
+   *   methods={"PUT"},
+   *   name="update_budget_entry",
    *   requirements={"year": "\d{4}"}
    * )
    * @ParamConverter("category")
    * @param Budget $budget
    * @param Category $category
+   * @param int $month
    * @param Request $request
    * @param ValidatorInterface $validator
    * @return JsonResponse
    */
-  public function create(Budget $budget, Category $category, Request $request, ValidatorInterface $validator)
+  public function update(Budget $budget, Category $category, int $month, Request $request, ValidatorInterface $validator)
   {
-    $entry = new BudgetEntry();
+    $entry = $this->getRepository()->findOneByOrNew([
+      'budget' => $budget,
+      'category' => $category,
+      'month' => $month,
+    ]);
     $entry->setBudget($budget);
     $entry->setCategory($category);
-    $entry->setMonth((int)$request->get('month'));
-    $entry->setPlan((float)$request->get('plan'));
-    $entry->setReal((float)$request->get('real'));
+    $entry->setMonth($month);
+
+    $plan = $request->get('planned');
+    if($plan)
+    {
+      $entry->setPlan((float)$plan);
+    }
+
+    $real = $request->get('real');
+    if($real)
+    {
+      $entry->setReal((float)$real);
+    }
+
     $errors = $validator->validate($entry);
 
-    if (count($errors) > 0) {
-      return $this->json($errors);
-    }
-
-    $this->getDoctrine()->getManager()->persist($entry);
-    $this->getDoctrine()->getManager()->flush();
-
-    return $this->json($entry, 201, [], ['groups' => ['entry']]);
-  }
-
-  /**
-   * @Route(
-   *   "/budgets/{year}/entries/{id}",
-   *   methods={"PUT"},
-   *   name="update_budget_entry",
-   *   requirements={"year": "\d{4}"}
-   * )
-   * @param BudgetEntry $entry
-   * @param Request $request
-   * @param ValidatorInterface $validator
-   * @return JsonResponse
-   */
-  public function update(BudgetEntry $entry, Request $request, ValidatorInterface $validator)
-  {
-    if ($request->request->has('plan'))
+    if(count($errors) > 0)
     {
-      $entry->setPlan((float)$request->get('plan'));
-    }
-    if ($request->request->has('real'))
-    {
-      $entry->setReal((float)$request->get('real'));
-    }
-    $errors = $validator->validate($entry);
-
-    if (count($errors) > 0) {
       return $this->json($errors);
     }
 

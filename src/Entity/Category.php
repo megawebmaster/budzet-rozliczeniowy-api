@@ -40,7 +40,8 @@ class Category
    * @var string Type of the category: expense, income, irregular
    * @ORM\Column(type="string")
    * @Assert\Choice(callback="getTypes")
-   * @Groups("category")
+   * @Groups({"category", "entry", "expense", "budget"})
+   * TODO: Move it back to simple "category" group - when fixed in frontend
    */
   private $type;
 
