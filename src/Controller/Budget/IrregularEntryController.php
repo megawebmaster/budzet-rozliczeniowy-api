@@ -17,44 +17,31 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-class EntryController extends FOSRestController
+class IrregularEntryController extends FOSRestController
 {
   /**
-   * @Route("/budgets/{year}/entries", methods={"GET"}, name="budget_entries", requirements={"year": "\d{4}"})
+   * @Route(
+   *   "/budgets/{year}/irregular",
+   *   methods={"GET"},
+   *   name="irregular_budget_entries",
+   *   requirements={"year": "\d{4}"}
+   * )
    * @param Budget $budget
    * @return JsonResponse
    */
   public function index(Budget $budget)
   {
     $repository = $this->getRepository();
-    $items = $repository->findBy(['budget' => $budget]);
+    $items = $repository->findBy(['budget' => $budget, 'month' => null]);
 
     return $this->json($items, 200, [], ['groups' => ['entry']]);
   }
 
   /**
    * @Route(
-   *   "/budgets/{year}/entries/{month}",
-   *   methods={"GET"},
-   *   name="budget_month_entries",
-   *   requirements={"year": "\d{4}", "month": "\d\d?"})
-   * @param Budget $budget
-   * @param int $month
-   * @return JsonResponse
-   */
-  public function month(Budget $budget, int $month)
-  {
-    $repository = $this->getRepository();
-    $items = $repository->findBy(['budget' => $budget, 'month' => $month]);
-
-    return $this->json($items, 200, [], ['groups' => ['entry']]);
-  }
-
-  /**
-   * @Route(
-   *   "/budgets/{year}/entries/{category_id}",
+   *   "/budgets/{year}/irregular/{category_id}",
    *   methods={"PUT"},
-   *   name="update_budget_entry",
+   *   name="update_irregular_budget_entry",
    *   requirements={"year": "\d{4}"}
    * )
    * @ParamConverter("category")
@@ -67,11 +54,9 @@ class EntryController extends FOSRestController
   public function update(Budget $budget, Category $category, Request $request, ValidatorInterface $validator)
   {
     $creator = new BudgetEntryCreator($this->getRepository(), $budget, $category);
-    $entry = $creator->findAndUpdate(
-      $request->get('month'),
-      $request->get('planned'),
-      $request->get('real')
-    );
+    $plan = $request->get('planned');
+    $real = $request->get('real');
+    $entry = $creator->findAndUpdate(null, $plan, $real);
     $errors = $validator->validate($entry);
 
     if(count($errors) > 0)
@@ -81,22 +66,16 @@ class EntryController extends FOSRestController
 
     $em = $this->getDoctrine()->getManager();
     $em->persist($entry);
+
+    for($month = 1; $month <= 12; $month++)
+    {
+      $item = $creator->findAndUpdate($month, $plan ? (float)$plan / 10.0 : 0.0, $real ? (float)$real / 10.0 : 0.0);
+      $em->persist($item);
+    }
+
     $em->flush();
 
     return $this->json($entry, 200, [], ['groups' => ['entry']]);
-  }
-
-  /**
-   * @Route("/budgets/{year}/entries/{id}", methods={"DELETE"}, name="delete_budget_entry")
-   * @param BudgetEntry $entry
-   * @return Response
-   */
-  public function delete(BudgetEntry $entry)
-  {
-    $this->getDoctrine()->getManager()->remove($entry);
-    $this->getDoctrine()->getManager()->flush();
-
-    return new Response();
   }
 
   /**

@@ -38,7 +38,7 @@ class BudgetEntry
 
   /**
    * @var integer Month this entry belongs to.
-   * @ORM\Column(type="integer")
+   * @ORM\Column(type="integer", nullable=true)
    * @Assert\Range(min="1", max="12")
    * @Groups({"entry", "budget"})
    */
@@ -60,7 +60,7 @@ class BudgetEntry
    */
   private $real;
 
-  public function getId(): int
+  public function getId(): ?int
   {
     return $this->id;
   }
@@ -90,12 +90,12 @@ class BudgetEntry
     $this->category = $category;
   }
 
-  public function getMonth(): int
+  public function getMonth(): ?int
   {
     return $this->month;
   }
 
-  public function setMonth(int $month): void
+  public function setMonth(?int $month): void
   {
     $this->month = $month;
   }
