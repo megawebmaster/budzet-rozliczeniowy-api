@@ -119,4 +119,19 @@ class BudgetEntry
   {
     $this->real = $real;
   }
+
+  public function addReal(float $value): void
+  {
+    $this->real += $value;
+  }
+
+  public function updateReal(float $old, float $new): void
+  {
+    $this->real += $new - $old;
+  }
+
+  public function subtractReal(float $value): void
+  {
+    $this->real -= $value;
+  }
 }

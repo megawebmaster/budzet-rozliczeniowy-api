@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace App\Controller\Budget;
 
 use App\Entity\Budget;
+use App\Entity\BudgetEntry;
 use App\Entity\BudgetExpense;
 use App\Entity\Category;
 use App\Repository\BudgetExpenseRepository;
@@ -68,6 +69,10 @@ class ExpenseController extends FOSRestController
       return $this->json($errors);
     }
 
+    $entry = $this->getMatchingEntry($budget, $month, $category);
+    $entry->addReal($expense->getValue());
+
+    $this->getDoctrine()->getManager()->persist($entry);
     $this->getDoctrine()->getManager()->persist($expense);
     $this->getDoctrine()->getManager()->flush();
 
@@ -95,6 +100,7 @@ class ExpenseController extends FOSRestController
       $expense->setCategory($category);
     }
 
+    $currentValue = $expense->getValue();
     $value = $request->get('value');
     if($value)
     {
@@ -119,6 +125,10 @@ class ExpenseController extends FOSRestController
       return $this->json($errors);
     }
 
+    $entry = $this->getMatchingEntry($expense->getBudget(), $expense->getMonth(), $category);
+    $entry->updateReal($currentValue, $expense->getValue());
+
+    $this->getDoctrine()->getManager()->persist($entry);
     $this->getDoctrine()->getManager()->persist($expense);
     $this->getDoctrine()->getManager()->flush();
 
@@ -132,6 +142,10 @@ class ExpenseController extends FOSRestController
    */
   public function delete(BudgetExpense $expense)
   {
+    $entry = $this->getMatchingEntry($expense->getBudget(), $expense->getMonth(), $expense->getCategory());
+    $entry->subtractReal($expense->getValue());
+
+    $this->getDoctrine()->getManager()->persist($entry);
     $this->getDoctrine()->getManager()->remove($expense);
     $this->getDoctrine()->getManager()->flush();
 
@@ -144,5 +158,14 @@ class ExpenseController extends FOSRestController
   private function getRepository(): ObjectRepository
   {
     return $this->getDoctrine()->getRepository(BudgetExpense::class);
+  }
+
+  private function getMatchingEntry(Budget $budget, int $month, Category $category): BudgetEntry
+  {
+    return $this->getDoctrine()->getRepository(BudgetEntry::class)->findOneBy([
+      'budget' => $budget,
+      'category' => $category,
+      'month' => $month
+    ]);
   }
 }
