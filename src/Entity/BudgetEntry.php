@@ -60,6 +60,15 @@ class BudgetEntry
    */
   private $real;
 
+  /**
+   * BudgetEntry constructor.
+   */
+  public function __construct()
+  {
+    $this->plan = 0.0;
+    $this->real = 0.0;
+  }
+
   public function getId(): ?int
   {
     return $this->id;

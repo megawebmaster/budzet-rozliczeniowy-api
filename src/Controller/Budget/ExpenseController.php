@@ -162,10 +162,20 @@ class ExpenseController extends FOSRestController
 
   private function getMatchingEntry(Budget $budget, int $month, Category $category): BudgetEntry
   {
-    return $this->getDoctrine()->getRepository(BudgetEntry::class)->findOneBy([
+    $entry = $this->getDoctrine()->getRepository(BudgetEntry::class)->findOneBy([
       'budget' => $budget,
       'category' => $category,
       'month' => $month
     ]);
+
+    if(!$entry)
+    {
+      $entry = new BudgetEntry();
+      $entry->setBudget($budget);
+      $entry->setCategory($category);
+      $entry->setMonth($month);
+    }
+
+    return $entry;
   }
 }

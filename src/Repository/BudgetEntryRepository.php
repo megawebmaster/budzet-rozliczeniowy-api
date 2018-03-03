@@ -20,8 +20,6 @@ class BudgetEntryRepository extends ServiceEntityRepository
     if(!$entry)
     {
       $entry = new BudgetEntry();
-      $entry->setPlan(0.0);
-      $entry->setReal(0.0);
     }
 
     return $entry;
