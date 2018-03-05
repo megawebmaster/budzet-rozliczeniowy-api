@@ -1,66 +1,46 @@
 <?php
-declare(strict_types=1);
 
 namespace App\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
- * @ORM\Entity(repositoryClass="App\Repository\CategoryRepository")
+ * @ORM\Entity(repositoryClass="App\Repository\AccountRepository")
  * @ORM\HasLifecycleCallbacks()
- * @UniqueEntity(fields={"name", "type", "parent"})
  */
-class Category
+class Account
 {
-  const TYPES = ['expense', 'income', 'irregular'];
-
   /**
-   * @var integer
    * @ORM\Id
    * @ORM\GeneratedValue
    * @ORM\Column(type="integer")
-   * @Groups({"category", "entry", "expense", "budget"})
+   * @Groups({"account", "account_state"})
    */
   private $id;
 
   /**
-   * @var string Name of the category.
+   * @var string Account name.
    * @ORM\Column(type="string", length=50)
    * @Assert\NotBlank()
-   * @Groups("category")
+   * @Groups("account")
    */
   private $name;
 
   /**
-   * @var string Type of the category: expense, income, irregular
-   * @ORM\Column(type="string")
-   * @Assert\Choice(callback="getTypes")
-   * @Groups({"category", "entry", "expense", "budget"})
-   * TODO: Move it back to simple "category" group - when fixed in frontend
+   * @var string Account description.
+   * @ORM\Column(type="string", length=255, nullable=true)
+   * @Groups("account")
    */
-  private $type;
-
-  /**
-   * @var Category Parent category.
-   * @ORM\ManyToOne(targetEntity="Category", inversedBy="subcategories")
-   * @Groups("category")
-   */
-  private $parent;
-
-  /**
-   * @var Category[] Subcategories list.
-   * @ORM\OneToMany(targetEntity="Category", mappedBy="parent")
-   */
-  private $subcategories;
+  private $description;
 
   /**
    * @var \DateTime Creation time.
    * @ORM\Column(type="datetime")
-   * @Groups("category")
+   * @Groups("account")
    */
   private $createdAt;
 
@@ -78,14 +58,16 @@ class Category
    */
   private $deletedAt;
 
-  public static function getTypes(): array
-  {
-    return self::TYPES;
-  }
+  /**
+   * @var AccountState[] List of state changes
+   * @ORM\OneToMany(targetEntity="AccountState", mappedBy="account")
+   * @Groups("account")
+   */
+  private $states;
 
   public function __construct()
   {
-    $this->subcategories = new ArrayCollection();
+    $this->states = new ArrayCollection();
   }
 
   /**
@@ -97,17 +79,17 @@ class Category
   }
 
   /**
-   * @return int
+   * @return mixed
    */
-  public function getId(): int
+  public function getId()
   {
     return $this->id;
   }
 
   /**
-   * @param int $id
+   * @param mixed $id
    */
-  public function setId(int $id): void
+  public function setId($id): void
   {
     $this->id = $id;
   }
@@ -129,35 +111,19 @@ class Category
   }
 
   /**
-   * @return string
+   * @return string|null
    */
-  public function getType(): string
+  public function getDescription(): ?string
   {
-    return $this->type;
+    return $this->description;
   }
 
   /**
-   * @param string $type
+   * @param string|null $description
    */
-  public function setType(string $type): void
+  public function setDescription(?string $description): void
   {
-    $this->type = $type;
-  }
-
-  /**
-   * @return Category
-   */
-  public function getParent(): ?Category
-  {
-    return $this->parent;
-  }
-
-  /**
-   * @param Category $parent
-   */
-  public function setParent(Category $parent): void
-  {
-    $this->parent = $parent;
+    $this->description = $description;
   }
 
   /**
@@ -171,7 +137,7 @@ class Category
   /**
    * @return \DateTime
    */
-  public function getStartedAt(): ?\DateTime
+  public function getStartedAt(): \DateTime
   {
     return $this->startedAt;
   }
@@ -193,10 +159,26 @@ class Category
   }
 
   /**
-   * @param \DateTime $deletedAt
+   * @param \DateTime|null $deletedAt
    */
   public function setDeletedAt(?\DateTime $deletedAt): void
   {
     $this->deletedAt = $deletedAt;
+  }
+
+  /**
+   * @return Collection<AccountState>
+   */
+  public function getStates(): Collection
+  {
+    return $this->states;
+  }
+
+  /**
+   * @param AccountState[] $states
+   */
+  public function setStates(array $states): void
+  {
+    $this->states = $states;
   }
 }
