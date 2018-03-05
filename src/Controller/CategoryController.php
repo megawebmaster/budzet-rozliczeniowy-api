@@ -31,9 +31,11 @@ class CategoryController extends FOSRestController
    */
   public function create(Request $request, ValidatorInterface $validator)
   {
+    $parentId = $request->get('parent_id');
     $category = $this->getRepository()->findOneByOrNew([
       'name' => $request->get('name'),
-      'type' => $request->get('type')
+      'type' => $request->get('type'),
+      'parent' => $parentId,
     ]);
 
     $category->setName($request->get('name'));
@@ -46,8 +48,7 @@ class CategoryController extends FOSRestController
       $category->setStartedAt($startedAt);
     }
 
-    $parentId = $request->get('parent_id');
-    if($parentId)
+    if($parentId && $category->getId() !== $parentId)
     {
       /** @var Category $parent */
       $parent = $this->getRepository()->find($parentId);
