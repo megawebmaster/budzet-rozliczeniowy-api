@@ -61,7 +61,13 @@ class IrregularEntryController extends FOSRestController
 
     if(count($errors) > 0)
     {
-      return $this->json($errors);
+      $result = [];
+      foreach($errors as $error)
+      {
+        $result[$error->getPropertyPath()] = $error->getMessage();
+      }
+
+      return $this->json($result);
     }
 
     $em = $this->getDoctrine()->getManager();

@@ -66,7 +66,13 @@ class ExpenseController extends FOSRestController
     $errors = $validator->validate($expense);
     if(count($errors) > 0)
     {
-      return $this->json($errors);
+      $result = [];
+      foreach($errors as $error)
+      {
+        $result[$error->getPropertyPath()] = $error->getMessage();
+      }
+
+      return $this->json($result);
     }
 
     $entry = $this->getMatchingEntry($budget, $month, $category);
@@ -122,7 +128,13 @@ class ExpenseController extends FOSRestController
     $errors = $validator->validate($expense);
     if(count($errors) > 0)
     {
-      return $this->json($errors);
+      $result = [];
+      foreach($errors as $error)
+      {
+        $result[$error->getPropertyPath()] = $error->getMessage();
+      }
+
+      return $this->json($result);
     }
 
     $entry = $this->getMatchingEntry($expense->getBudget(), $expense->getMonth(), $category);
