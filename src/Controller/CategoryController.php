@@ -20,7 +20,7 @@ class CategoryController extends FOSRestController
    */
   public function index()
   {
-    return $this->json($this->getRepository()->findAll(), 200, [], ['groups' => ['category']]);
+    return $this->json($this->getRepository()->findBy([], ['id' => 'ASC']), 200, [], ['groups' => ['category']]);
   }
 
   /**
@@ -75,7 +75,7 @@ class CategoryController extends FOSRestController
   }
 
   /**
-   * @Route("/categories/{category_id}", methods={"PUT"}, name="update_category")
+   * @Route("/categories/{category_id}", methods={"PATCH"}, name="update_category")
    * @param Category $category
    * @param Request $request
    * @param ValidatorInterface $validator
