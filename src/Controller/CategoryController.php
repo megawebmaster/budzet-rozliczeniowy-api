@@ -20,7 +20,7 @@ class CategoryController extends FOSRestController
    */
   public function index()
   {
-    return $this->json($this->getRepository()->findBy([], ['id' => 'ASC']), 200, [], ['groups' => ['category']]);
+    return $this->json($this->getRepository()->findAll(), 200, [], ['groups' => ['category']]);
   }
 
   /**

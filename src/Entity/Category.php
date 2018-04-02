@@ -78,6 +78,12 @@ class Category
    */
   private $deletedAt;
 
+  /**
+   * @var float Average value from last 12 months of expenses.
+   * @Groups("category")
+   */
+  private $averageValue = 0.0;
+
   public static function getTypes(): array
   {
     return self::TYPES;
@@ -198,5 +204,21 @@ class Category
   public function setDeletedAt(?\DateTime $deletedAt): void
   {
     $this->deletedAt = $deletedAt;
+  }
+
+  /**
+   * @return float
+   */
+  public function getAverageValue(): ?float
+  {
+    return $this->averageValue;
+  }
+
+  /**
+   * @param float $averageValue
+   */
+  public function setAverageValue(float $averageValue): void
+  {
+    $this->averageValue = $averageValue;
   }
 }
