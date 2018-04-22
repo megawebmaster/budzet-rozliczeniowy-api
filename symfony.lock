@@ -1,7 +1,4 @@
 {
-    "behat/transliterator": {
-        "version": "v1.2.0"
-    },
     "composer/ca-bundle": {
         "version": "1.1.0"
     },
@@ -71,9 +68,6 @@
             "ref": "258300d52be6ad59b32a888d5ddafbf9638540ff"
         }
     },
-    "gedmo/doctrine-extensions": {
-        "version": "v2.4.33"
-    },
     "jdorn/sql-formatter": {
         "version": "v1.2.17"
     },
@@ -88,6 +82,9 @@
             "version": "1.5",
             "ref": "7b6cbc842f8cd3d550815247d12294f6f304a8c4"
         }
+    },
+    "nikic/php-parser": {
+        "version": "v4.0.1"
     },
     "ocramius/package-versions": {
         "version": "1.3.0"
@@ -132,15 +129,6 @@
             "branch": "master",
             "version": "4.0",
             "ref": "e65a105bf4cd5b1b79012ba029954927f05922e8"
-        }
-    },
-    "stof/doctrine-extensions-bundle": {
-        "version": "1.2",
-        "recipe": {
-            "repo": "github.com/symfony/recipes-contrib",
-            "branch": "master",
-            "version": "1.2",
-            "ref": "6c1ceb662f8997085f739cd089bfbef67f245983"
         }
     },
     "symfony/cache": {

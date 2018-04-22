@@ -26,12 +26,15 @@ class Auth0Guard extends AbstractGuardAuthenticator
   private $signer;
   /** @var FilesystemAdapter */
   private $cache;
+  /** @var string */
+  private $tenantUrl;
 
-  public function __construct()
+  public function __construct($tenantUrl)
   {
     $this->parser = new Parser();
     $this->signer = new Sha256();
     $this->cache = new FilesystemAdapter();
+    $this->tenantUrl = $tenantUrl;
   }
 
   /**
@@ -188,8 +191,7 @@ class Auth0Guard extends AbstractGuardAuthenticator
 
   private function retrieveJwks()
   {
-    // TODO: Extract this to configuration file
-    $json = file_get_contents('https://megawebmaster.eu.auth0.com/.well-known/jwks.json');
+    $json = file_get_contents($this->tenantUrl.'/.well-known/jwks.json');
     $jwks = json_decode($json);
 
     return array_filter($jwks->keys, function ($key){
