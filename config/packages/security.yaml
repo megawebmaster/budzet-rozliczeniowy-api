@@ -1,0 +1,13 @@
+security:
+  providers:
+    auth0:
+      id: App\Security\User\Auth0UserProvider
+  firewalls:
+    main:
+      anonymous: false
+      guard:
+        authenticators:
+          - App\Security\Guard\Auth0Guard
+
+  access_control:
+    - { path: ^/, roles: ROLE_USER }
