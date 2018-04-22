@@ -5,8 +5,10 @@ namespace App\Controller\Budget;
 
 use App\Entity\Budget;
 use App\Entity\BudgetEntry;
+use App\Entity\BudgetYear;
 use App\Entity\Category;
 use App\Repository\BudgetEntryRepository;
+use App\Security\User\Auth0User;
 use App\Service\BudgetEntryCreator;
 use Doctrine\Common\Persistence\ObjectRepository;
 use FOS\RestBundle\Controller\FOSRestController;
@@ -21,39 +23,41 @@ class IrregularEntryController extends FOSRestController
 {
   /**
    * @Route(
-   *   "/budgets/{year}/irregular",
+   *   "/budgets/{budget_id}/{year}/irregular",
    *   methods={"GET"},
    *   name="irregular_budget_entries",
    *   requirements={"year": "\d{4}"}
    * )
-   * @param Budget $budget
+   * @param BudgetYear $budgetYear
    * @return JsonResponse
    */
-  public function index(Budget $budget)
+  public function index(BudgetYear $budgetYear)
   {
     $repository = $this->getRepository();
-    $items = $repository->findBy(['budget' => $budget, 'month' => null]);
+    $items = $repository->findBy(['budgetYear' => $budgetYear, 'month' => null]);
 
     return $this->json($items, 200, [], ['groups' => ['entry']]);
   }
 
   /**
    * @Route(
-   *   "/budgets/{year}/irregular/{category_id}",
+   *   "/budgets/{budget_id}/{year}/irregular/{category_id}",
    *   methods={"PUT"},
    *   name="update_irregular_budget_entry",
    *   requirements={"year": "\d{4}"}
    * )
    * @ParamConverter("category")
-   * @param Budget $budget
+   * @param BudgetYear $budgetYear
    * @param Category $category
    * @param Request $request
    * @param ValidatorInterface $validator
    * @return JsonResponse
    */
-  public function update(Budget $budget, Category $category, Request $request, ValidatorInterface $validator)
+  public function update(BudgetYear $budgetYear, Category $category, Request $request, ValidatorInterface $validator)
   {
-    $creator = new BudgetEntryCreator($this->getRepository(), $budget, $category);
+    /** @var Auth0User $user */
+    $user = $this->getUser();
+    $creator = new BudgetEntryCreator($this->getRepository(), $budgetYear, $category, $user);
     $plan = $request->get('planned');
     $real = $request->get('real');
     $entry = $creator->findAndUpdate(null, $plan, $real);

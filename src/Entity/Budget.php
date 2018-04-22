@@ -7,7 +7,6 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
-use Symfony\Component\Serializer\Annotation\MaxDepth;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
@@ -20,17 +19,9 @@ class Budget
    * @ORM\Id
    * @ORM\GeneratedValue
    * @ORM\Column(type="integer")
-   * @Groups({"budget", "entry", "expense"})
+   * @Groups({"budget", "budget_year"})
    */
   private $id;
-
-  /**
-   * @var integer Year the budget is for.
-   * @ORM\Column(type="integer")
-   * @Assert\NotBlank
-   * @Groups("budget")
-   */
-  private $year;
 
   /**
    * @var string Name of the budget.
@@ -41,23 +32,20 @@ class Budget
   private $name;
 
   /**
-   * @var BudgetEntry[] List of entries
-   * @ORM\OneToMany(targetEntity="BudgetEntry", mappedBy="budget")
-   * @Groups("budget")
+   * @var Category[] List of categories
+   * @ORM\OneToMany(targetEntity="Category", mappedBy="budget")
    */
-  private $entries;
+  private $categories;
 
   /**
-   * @var BudgetExpense[] List of expenses
-   * @ORM\OneToMany(targetEntity="BudgetExpense", mappedBy="budget")
-   * @Groups("budget")
+   * @var string Owner's ID
+   * @ORM\Column(type="string", length=50, nullable=false)
    */
-  private $expenses;
+  private $userId;
 
   public function __construct()
   {
-    $this->entries = new ArrayCollection();
-    $this->expenses = new ArrayCollection();
+    $this->categories = new ArrayCollection();
   }
 
   /**
@@ -77,19 +65,19 @@ class Budget
   }
 
   /**
-   * @return int
+   * @return string
    */
-  public function getYear(): int
+  public function getUserId(): string
   {
-    return $this->year;
+    return $this->userId;
   }
 
   /**
-   * @param int $year
+   * @param string $userId
    */
-  public function setYear(int $year): void
+  public function setUserId(string $userId): void
   {
-    $this->year = $year;
+    $this->userId = $userId;
   }
 
   /**
@@ -103,40 +91,24 @@ class Budget
   /**
    * @param string $name
    */
-  public function setName(string $name): void
+  public function setName(?string $name): void
   {
     $this->name = $name;
   }
 
   /**
-   * @return Collection<BudgetEntry>
+   * @return Category[]
    */
-  public function getEntries(): Collection
+  public function getCategories(): Collection
   {
-    return $this->entries;
+    return $this->categories;
   }
 
   /**
-   * @param BudgetEntry[] $entries
+   * @param Category[] $categories
    */
-  public function setEntries(array $entries): void
+  public function setCategories(array $categories): void
   {
-    $this->entries = $entries;
-  }
-
-  /**
-   * @return Collection<BudgetExpense>
-   */
-  public function getExpenses(): Collection
-  {
-    return $this->expenses;
-  }
-
-  /**
-   * @param BudgetExpense[] $expenses
-   */
-  public function setExpenses(array $expenses): void
-  {
-    $this->expenses = $expenses;
+    $this->categories = $categories;
   }
 }

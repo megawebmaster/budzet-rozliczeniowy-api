@@ -22,11 +22,11 @@ class BudgetEntry
   private $id;
 
   /**
-   * @var Budget Budget this entry belongs to.
-   * @ORM\ManyToOne(targetEntity="Budget", inversedBy="entries")
+   * @var BudgetYear Budget year this entry belongs to.
+   * @ORM\ManyToOne(targetEntity="BudgetYear", inversedBy="entries")
    * @Groups("entry")
    */
-  private $budget;
+  private $budgetYear;
 
   /**
    * @var Category Category ID this entry belongs to.
@@ -61,6 +61,12 @@ class BudgetEntry
   private $real;
 
   /**
+   * @var string Creator's ID
+   * @ORM\Column(type="string", length=50, nullable=false)
+   */
+  private $creatorId;
+
+  /**
    * BudgetEntry constructor.
    */
   public function __construct()
@@ -79,14 +85,30 @@ class BudgetEntry
     $this->id = $id;
   }
 
-  public function getBudget(): Budget
+  /**
+   * @return string
+   */
+  public function getCreatorId(): string
   {
-    return $this->budget;
+    return $this->creatorId;
   }
 
-  public function setBudget(Budget $budget): void
+  /**
+   * @param string $creatorId
+   */
+  public function setCreatorId(string $creatorId): void
   {
-    $this->budget = $budget;
+    $this->creatorId = $creatorId;
+  }
+
+  public function getBudgetYear(): BudgetYear
+  {
+    return $this->budgetYear;
+  }
+
+  public function setBudgetYear(BudgetYear $budgetYear): void
+  {
+    $this->budgetYear = $budgetYear;
   }
 
   public function getCategory(): Category

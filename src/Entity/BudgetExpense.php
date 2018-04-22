@@ -22,11 +22,11 @@ class BudgetExpense
   private $id;
 
   /**
-   * @var Budget Budget this expense belongs to.
-   * @ORM\ManyToOne(targetEntity="Budget", inversedBy="expenses")
+   * @var BudgetYear Budget year this expense belongs to.
+   * @ORM\ManyToOne(targetEntity="BudgetYear", inversedBy="expenses")
    * @Groups("expense")
    */
-  private $budget;
+  private $budgetYear;
 
   /**
    * @var Category
@@ -68,112 +68,86 @@ class BudgetExpense
   private $description;
 
   /**
-   * @return int
+   * @var string Creator's ID
+   * @ORM\Column(type="string", length=50, nullable=false)
    */
+  private $creatorId;
+
   public function getId(): int
   {
     return $this->id;
   }
 
-  /**
-   * @param int $id
-   */
   public function setId(int $id): void
   {
     $this->id = $id;
   }
 
-  /**
-   * @return Budget
-   */
-  public function getBudget(): Budget
+  public function getCreatorId(): string
   {
-    return $this->budget;
+    return $this->creatorId;
   }
 
-  /**
-   * @param Budget $budget
-   */
-  public function setBudget(Budget $budget): void
+  public function setCreatorId(string $creatorId): void
   {
-    $this->budget = $budget;
+    $this->creatorId = $creatorId;
   }
 
-  /**
-   * @return Category
-   */
+  public function getBudgetYear(): BudgetYear
+  {
+    return $this->budgetYear;
+  }
+
+  public function setBudgetYear(BudgetYear $budgetYear): void
+  {
+    $this->budgetYear = $budgetYear;
+  }
+
   public function getCategory(): Category
   {
     return $this->category;
   }
 
-  /**
-   * @param Category $category
-   */
   public function setCategory(Category $category): void
   {
     $this->category = $category;
   }
 
-  /**
-   * @return int
-   */
   public function getMonth(): int
   {
     return $this->month;
   }
 
-  /**
-   * @param int $month
-   */
   public function setMonth(int $month): void
   {
     $this->month = $month;
   }
 
-  /**
-   * @return int
-   */
   public function getDay(): int
   {
     return $this->day;
   }
 
-  /**
-   * @param int $day
-   */
   public function setDay(int $day): void
   {
     $this->day = $day;
   }
 
-  /**
-   * @return float
-   */
   public function getValue(): float
   {
     return (float)$this->value;
   }
 
-  /**
-   * @param float $value
-   */
   public function setValue(float $value): void
   {
     $this->value = $value;
   }
 
-  /**
-   * @return string
-   */
   public function getDescription(): string
   {
     return $this->description;
   }
 
-  /**
-   * @param string $description
-   */
   public function setDescription(string $description): void
   {
     $this->description = $description;

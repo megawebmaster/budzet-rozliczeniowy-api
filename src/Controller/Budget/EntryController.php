@@ -3,10 +3,11 @@ declare(strict_types=1);
 
 namespace App\Controller\Budget;
 
-use App\Entity\Budget;
 use App\Entity\BudgetEntry;
+use App\Entity\BudgetYear;
 use App\Entity\Category;
 use App\Repository\BudgetEntryRepository;
+use App\Security\User\Auth0User;
 use App\Service\BudgetEntryCreator;
 use Doctrine\Common\Persistence\ObjectRepository;
 use FOS\RestBundle\Controller\FOSRestController;
@@ -20,53 +21,61 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 class EntryController extends FOSRestController
 {
   /**
-   * @Route("/budgets/{year}/entries", methods={"GET"}, name="budget_entries", requirements={"year": "\d{4}"})
-   * @param Budget $budget
+   * @Route(
+   *   "/budgets/{budget_id}/{year}/entries",
+   *   methods={"GET"},
+   *   name="budget_entries",
+   *   requirements={"year": "\d{4}"}
+   * )
+   * @param BudgetYear $budgetYear
    * @return JsonResponse
    */
-  public function index(Budget $budget)
+  public function index(BudgetYear $budgetYear)
   {
     $repository = $this->getRepository();
-    $items = $repository->findBy(['budget' => $budget]);
+    $items = $repository->findBy(['budgetYear' => $budgetYear]);
 
     return $this->json($items, 200, [], ['groups' => ['entry']]);
   }
 
   /**
    * @Route(
-   *   "/budgets/{year}/entries/{month}",
+   *   "/budgets/{budget_id}/{year}/entries/{month}",
    *   methods={"GET"},
    *   name="budget_month_entries",
    *   requirements={"year": "\d{4}", "month": "\d\d?"})
-   * @param Budget $budget
+   * @param BudgetYear $budgetYear
    * @param int $month
    * @return JsonResponse
    */
-  public function month(Budget $budget, int $month)
+  public function month(BudgetYear $budgetYear, int $month)
   {
     $repository = $this->getRepository();
-    $items = $repository->findBy(['budget' => $budget, 'month' => $month]);
+    $items = $repository->findBy(['budgetYear' => $budgetYear, 'month' => $month]);
 
     return $this->json($items, 200, [], ['groups' => ['entry']]);
   }
 
   /**
+   * TODO: Use `month` parameter as well here to keep URLs consistent
    * @Route(
-   *   "/budgets/{year}/entries/{category_id}",
+   *   "/budgets/{budget_id}/{year}/entries/{category_id}",
    *   methods={"PUT"},
    *   name="update_budget_entry",
    *   requirements={"year": "\d{4}"}
    * )
    * @ParamConverter("category")
-   * @param Budget $budget
+   * @param BudgetYear $budgetYear
    * @param Category $category
    * @param Request $request
    * @param ValidatorInterface $validator
    * @return JsonResponse
    */
-  public function update(Budget $budget, Category $category, Request $request, ValidatorInterface $validator)
+  public function update(BudgetYear $budgetYear, Category $category, Request $request, ValidatorInterface $validator)
   {
-    $creator = new BudgetEntryCreator($this->getRepository(), $budget, $category);
+    /** @var Auth0User $user */
+    $user = $this->getUser();
+    $creator = new BudgetEntryCreator($this->getRepository(), $budgetYear, $category, $user);
     $entry = $creator->findAndUpdate(
       $request->get('month'),
       $request->get('planned'),
@@ -93,12 +102,20 @@ class EntryController extends FOSRestController
   }
 
   /**
-   * @Route("/budgets/{year}/entries/{id}", methods={"DELETE"}, name="delete_budget_entry")
+   * TODO: Use `month` parameter as well here to keep URLs consistent
+   * @Route("/budgets/{budget_id}/{year}/entries/{id}", methods={"DELETE"}, name="delete_budget_entry")
    * @param BudgetEntry $entry
    * @return Response
    */
   public function delete(BudgetEntry $entry)
   {
+    /** @var Auth0User $user */
+    $user = $this->getUser();
+    if($entry->getCreatorId() !== $user->getId())
+    {
+      return new Response('', 403);
+    }
+
     $this->getDoctrine()->getManager()->remove($entry);
     $this->getDoctrine()->getManager()->flush();
 

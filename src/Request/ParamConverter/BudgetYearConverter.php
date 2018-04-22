@@ -3,7 +3,8 @@ declare(strict_types=1);
 
 namespace App\Request\ParamConverter;
 
-use App\Entity\Category;
+use App\Entity\Budget;
+use App\Entity\BudgetYear;
 use App\Security\User\Auth0User;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
@@ -11,9 +12,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Request\ParamConverter\ParamConverterInte
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
-/**
- */
-class CategoryConverter implements ParamConverterInterface
+class BudgetYearConverter implements ParamConverterInterface
 {
   /** @var ManagerRegistry */
   private $registry;
@@ -48,26 +47,23 @@ class CategoryConverter implements ParamConverterInterface
     }
     /** @var Auth0User $user */
     $user = $token->getUser();
-    $name = $configuration->getName();
+    /** @var int $year */
+    $year = $request->get('year');
     $em = $this->registry->getManager();
-    /** @var Category $object */
-    $object = $em->getRepository(Category::class)->find($request->get('category_id'));
+    $budgetRepository = $em->getRepository(Budget::class);
+    /** @var Budget $budget */
+    $budget = $budgetRepository->findOneBy(['id' => $request->get('budget_id'), 'userId' => $user->getId()]);
+    $name = $configuration->getName();
+    $repository = $em->getRepository(BudgetYear::class);
+    $object = $repository->findOneBy(['budget' => $budget]);
 
     if(!$object)
     {
-      if($configuration->isOptional())
-      {
-        $request->attributes->set($name, null);
-
-        return true;
-      }
-
-      return false;
-    }
-
-    if($object->getCreatorId() !== $user->getId())
-    {
-      return false;
+      $object = new BudgetYear();
+      $object->setBudget($budget);
+      $object->setYear($year);
+      $em->persist($object);
+      $em->flush();
     }
 
     $request->attributes->set($name, $object);
@@ -83,6 +79,6 @@ class CategoryConverter implements ParamConverterInterface
    */
   public function supports(ParamConverter $configuration)
   {
-    return $configuration->getClass() === Category::class && $configuration->getName() === 'category';
+    return $configuration->getClass() === BudgetYear::class;
   }
 }

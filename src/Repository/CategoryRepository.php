@@ -28,12 +28,12 @@ class CategoryRepository extends ServiceEntityRepository
     return $category;
   }
 
-  public function findAll()
+  public function findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
   {
     $averages = $this->getAverageExpenses();
 
     /** @var Category[] $results */
-    $results = parent::findBy([], ['id' => 'ASC']);
+    $results = parent::findBy($criteria, ['id' => 'ASC']);
 
     foreach($results as $result)
     {
@@ -57,7 +57,7 @@ SELECT e.category_id, AVG(e.real) AS average FROM (
   SELECT d.category_id, d.real, 
     row_number() OVER (PARTITION BY d.category_id ORDER BY db.year DESC, d.month DESC) AS rank
   FROM budget_entry d
-  LEFT JOIN budget db ON db.id = d.budget_id
+  LEFT JOIN budget_year db ON db.id = d.budget_year_id
   WHERE d.real > 0
 ) AS e
 WHERE e.rank <= 12

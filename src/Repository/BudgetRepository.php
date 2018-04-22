@@ -5,8 +5,6 @@ namespace App\Repository;
 
 use App\Entity\Budget;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\ORM\ORMException;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
 class BudgetRepository extends ServiceEntityRepository
@@ -16,33 +14,15 @@ class BudgetRepository extends ServiceEntityRepository
     parent::__construct($registry, Budget::class);
   }
 
-  public function create(int $year): Budget
+  public function findOneByOrNew(array $criteria, array $orderBy = null): Budget
   {
-    $budget = new Budget();
-    $budget->setName('budget');
-    $budget->setYear($year);
+    $budget = $this->findOneBy($criteria, $orderBy);
 
-    try
+    if(!$budget)
     {
-      $this->getEntityManager()->persist($budget);
-      $this->getEntityManager()->flush();
-
-      return $budget;
-    } catch (ORMException $e) {
-      return null;
+      $budget = new Budget();
     }
-  }
 
-  public function getAvailableYears(): ArrayCollection
-  {
-    $elements = $this
-      ->createQueryBuilder('o')
-      ->select('o.year')
-      ->getQuery()
-      ->execute()
-    ;
-    $collection = new ArrayCollection($elements);
-
-    return $collection->map(function($item){ return $item['year']; });
+    return $budget;
   }
 }

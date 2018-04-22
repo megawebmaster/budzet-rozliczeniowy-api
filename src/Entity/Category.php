@@ -28,6 +28,13 @@ class Category
   private $id;
 
   /**
+   * @var Budget Budget this category belongs to.
+   * @ORM\ManyToOne(targetEntity="Budget", inversedBy="categories")
+   * @Groups("category")
+   */
+  private $budget;
+
+  /**
    * @var string Name of the category.
    * @ORM\Column(type="string", length=50)
    * @Assert\NotBlank()
@@ -79,6 +86,12 @@ class Category
   private $deletedAt;
 
   /**
+   * @var string Creator's ID
+   * @ORM\Column(type="string", length=50, nullable=false)
+   */
+  private $creatorId;
+
+  /**
    * @var float Average value from last 12 months of expenses.
    * @Groups("category")
    */
@@ -102,121 +115,96 @@ class Category
     $this->createdAt = new \DateTime('now');
   }
 
-  /**
-   * @return int|null
-   */
   public function getId(): ?int
   {
     return $this->id;
   }
 
-  /**
-   * @param int $id
-   */
   public function setId(int $id): void
   {
     $this->id = $id;
   }
 
-  /**
-   * @return string
-   */
+  public function getCreatorId(): string
+  {
+    return $this->creatorId;
+  }
+
+  public function setCreatorId(string $creatorId): void
+  {
+    $this->creatorId = $creatorId;
+  }
+
+  public function getBudget(): Budget
+  {
+    return $this->budget;
+  }
+
+  public function setBudget(Budget $budget): void
+  {
+    $this->budget = $budget;
+  }
+
   public function getName(): string
   {
     return $this->name;
   }
 
-  /**
-   * @param string $name
-   */
   public function setName(string $name): void
   {
     $this->name = $name;
   }
 
-  /**
-   * @return string
-   */
   public function getType(): string
   {
     return $this->type;
   }
 
-  /**
-   * @param string $type
-   */
   public function setType(string $type): void
   {
     $this->type = $type;
   }
 
-  /**
-   * @return Category
-   */
   public function getParent(): ?Category
   {
     return $this->parent;
   }
 
-  /**
-   * @param Category $parent
-   */
   public function setParent(Category $parent): void
   {
     $this->parent = $parent;
   }
 
-  /**
-   * @return \DateTime
-   */
   public function getCreatedAt(): \DateTime
   {
     return $this->createdAt;
   }
 
-  /**
-   * @return \DateTime
-   */
   public function getStartedAt(): ?\DateTime
   {
     return $this->startedAt;
   }
 
-  /**
-   * @param \DateTime $startedAt
-   */
   public function setStartedAt(\DateTime $startedAt): void
   {
     $this->startedAt = $startedAt;
   }
 
-  /**
-   * @return \DateTime
-   */
   public function getDeletedAt(): ?\DateTime
   {
     return $this->deletedAt;
   }
 
-  /**
-   * @param \DateTime $deletedAt
-   */
   public function setDeletedAt(?\DateTime $deletedAt): void
   {
     $this->deletedAt = $deletedAt;
   }
 
-  /**
-   * @return float
-   */
   public function getAverageValue(): ?float
   {
     return $this->averageValue;
   }
 
-  /**
-   * @param float $averageValue
-   */
   public function setAverageValue(float $averageValue): void
   {
     $this->averageValue = $averageValue;

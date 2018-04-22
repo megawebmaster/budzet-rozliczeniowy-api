@@ -4,24 +4,30 @@ declare(strict_types=1);
 namespace App\Request\ParamConverter;
 
 use App\Entity\Budget;
+use App\Security\User\Auth0User;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Sensio\Bundle\FrameworkExtraBundle\Request\ParamConverter\ParamConverterInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class BudgetConverter implements ParamConverterInterface
 {
   /** @var ManagerRegistry */
   private $registry;
+  /** @var TokenStorageInterface */
+  private $tokenStorage;
 
   /**
    * CategoryConverter constructor.
    *
+   * @param TokenStorageInterface $tokenStorage
    * @param ManagerRegistry $registry
    */
-  public function __construct(ManagerRegistry $registry = null)
+  public function __construct(TokenStorageInterface $tokenStorage, ManagerRegistry $registry = null)
   {
     $this->registry = $registry;
+    $this->tokenStorage = $tokenStorage;
   }
 
   /**
@@ -33,18 +39,22 @@ class BudgetConverter implements ParamConverterInterface
    */
   public function apply(Request $request, ParamConverter $configuration)
   {
-    $year = (int)$request->get('year');
-    $name = $configuration->getName();
+    $token = $this->tokenStorage->getToken();
+    if($token === null)
+    {
+      return false;
+    }
+    /** @var Auth0User $user */
+    $user = $token->getUser();
+    $budgetId = $request->get('budget_id');
     $em = $this->registry->getManager();
-    $object = $em->getRepository(Budget::class)->findOneBy(['year' => $year]);
+    $repository = $em->getRepository(Budget::class);
+    $name = $configuration->getName();
+    $object = $repository->findOneBy(['id' => $budgetId, 'userId' => $user->getId()]);
 
     if(!$object)
     {
-      $object = new Budget();
-      $object->setYear($year);
-      $object->setName('Budget');
-      $em->persist($object);
-      $em->flush();
+      return false;
     }
 
     $request->attributes->set($name, $object);
