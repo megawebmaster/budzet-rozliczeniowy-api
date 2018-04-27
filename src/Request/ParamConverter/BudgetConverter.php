@@ -47,10 +47,19 @@ class BudgetConverter implements ParamConverterInterface
     /** @var Auth0User $user */
     $user = $token->getUser();
     $budgetId = $request->get('budget_id');
+    $budgetSlug = $request->get('budget_slug');
     $em = $this->registry->getManager();
     $repository = $em->getRepository(Budget::class);
     $name = $configuration->getName();
-    $object = $repository->findOneBy(['id' => $budgetId, 'userId' => $user->getId()]);
+
+    if ($budgetId !== null)
+    {
+      $object = $repository->findOneBy(['id' => $budgetId, 'userId' => $user->getId()]);
+    }
+    else
+    {
+      $object = $repository->findOneBy(['slug' => $budgetSlug, 'userId' => $user->getId()]);
+    }
 
     if(!$object)
     {

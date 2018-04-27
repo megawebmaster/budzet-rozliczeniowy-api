@@ -9,6 +9,7 @@ use App\Repository\CategoryRepository;
 use App\Security\User\Auth0User;
 use Doctrine\Common\Persistence\ObjectRepository;
 use FOS\RestBundle\Controller\FOSRestController;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -18,7 +19,8 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 class CategoryController extends FOSRestController
 {
   /**
-   * @Route("/budgets/{budget_id}/categories", name="categories", methods={"GET"})
+   * @Route("/budgets/{budget_slug}/categories", name="categories", methods={"GET"})
+   * @ParamConverter("budget")
    * @param Budget $budget
    * @return JsonResponse
    */
@@ -28,7 +30,7 @@ class CategoryController extends FOSRestController
   }
 
   /**
-   * @Route("/budgets/{budget_id}/categories", methods={"POST"}, name="new_category")
+   * @Route("/budgets/{budget_slug}/categories", methods={"POST"}, name="new_category")
    * @param Budget $budget
    * @param Request $request
    * @param ValidatorInterface $validator
@@ -85,7 +87,7 @@ class CategoryController extends FOSRestController
   }
 
   /**
-   * @Route("/budgets/{budget_id}/categories/{category_id}", methods={"PATCH"}, name="update_category")
+   * @Route("/budgets/{budget_slug}/categories/{category_id}", methods={"PATCH"}, name="update_category")
    * @param Category $category
    * @param Request $request
    * @param ValidatorInterface $validator
@@ -118,7 +120,7 @@ class CategoryController extends FOSRestController
   }
 
   /**
-   * @Route("/budgets/{budget_id}/categories/{category_id}", methods={"DELETE"}, name="delete_category")
+   * @Route("/budgets/{budget_slug}/categories/{category_id}", methods={"DELETE"}, name="delete_category")
    * @param Category $category
    * @param Request $request
    * @return Response

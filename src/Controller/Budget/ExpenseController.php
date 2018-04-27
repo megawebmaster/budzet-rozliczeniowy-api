@@ -22,7 +22,7 @@ class ExpenseController extends FOSRestController
 {
   /**
    * @Route(
-   *   "/budgets/{budget_id}/{year}/expenses/{month}",
+   *   "/budgets/{budget_slug}/{year}/expenses/{month}",
    *   name="budget_expenses",
    *   methods={"GET"},
    *   requirements={"year": "\d{4}", "month": "\d{1,2}"}
@@ -41,7 +41,7 @@ class ExpenseController extends FOSRestController
 
   /**
    * @Route(
-   *   "/budgets/{budget_id}/{year}/expenses/{month}",
+   *   "/budgets/{budget_slug}/{year}/expenses/{month}",
    *   methods={"POST"},
    *   name="new_budget_expense",
    *   requirements={"year": "\d{4}", "month": "\d{1,2}"}
@@ -91,7 +91,7 @@ class ExpenseController extends FOSRestController
 
   /**
    * @Route(
-   *   "/budgets/{budget_id}/{year}/expenses/{month}/{id}",
+   *   "/budgets/{budget_slug}/{year}/expenses/{month}/{id}",
    *   methods={"PUT"},
    *   name="update_budget_expense",
    *   requirements={"year": "\d{4}", "month": "\d{1,2}"}
@@ -152,7 +152,7 @@ class ExpenseController extends FOSRestController
   }
 
   /**
-   * @Route("/budgets/{budget_id}/{year}/expenses/{month}/{id}", methods={"DELETE"}, name="delete_budget_expense")
+   * @Route("/budgets/{budget_slug}/{year}/expenses/{month}/{id}", methods={"DELETE"}, name="delete_budget_expense")
    * @param BudgetExpense $expense
    * @return Response
    */

@@ -40,19 +40,15 @@ class BudgetYearConverter implements ParamConverterInterface
    */
   public function apply(Request $request, ParamConverter $configuration)
   {
-    $token = $this->tokenStorage->getToken();
-    if($token === null)
+    $budget = $this->getBudget($request);
+    if($budget === null)
     {
       return false;
     }
-    /** @var Auth0User $user */
-    $user = $token->getUser();
+
     /** @var int $year */
-    $year = $request->get('year');
+    $year = (int)$request->get('year');
     $em = $this->registry->getManager();
-    $budgetRepository = $em->getRepository(Budget::class);
-    /** @var Budget $budget */
-    $budget = $budgetRepository->findOneBy(['id' => $request->get('budget_id'), 'userId' => $user->getId()]);
     $name = $configuration->getName();
     $repository = $em->getRepository(BudgetYear::class);
     $object = $repository->findOneBy(['budget' => $budget]);
@@ -80,5 +76,42 @@ class BudgetYearConverter implements ParamConverterInterface
   public function supports(ParamConverter $configuration)
   {
     return $configuration->getClass() === BudgetYear::class;
+  }
+
+  /**
+   * @param Request $request
+   * @return Budget|null
+   */
+  private function getBudget(Request $request): ?Budget
+  {
+    $token = $this->tokenStorage->getToken();
+    if($token === null)
+    {
+      return null;
+    }
+
+    /** @var Auth0User $user */
+    $user = $token->getUser();
+    $criteria = ['userId' => $user->getId()];
+
+    if(($id = $request->get('budget_id')) !== null)
+    {
+      $criteria['id'] = $id;
+    }
+    else if(($slug = $request->get('budget_slug')) !== null)
+    {
+      $criteria['slug'] = $slug;
+    }
+    else
+    {
+      return null;
+    }
+
+    $em = $this->registry->getManager();
+    $budgetRepository = $em->getRepository(Budget::class);
+    /** @var Budget $budget */
+    $budget = $budgetRepository->findOneBy($criteria);
+
+    return $budget;
   }
 }

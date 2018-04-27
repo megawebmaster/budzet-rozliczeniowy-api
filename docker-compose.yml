@@ -7,6 +7,8 @@ services:
       POSTGRES_DB: budzet
     ports:
       - "5432:5432"
+    networks:
+      - application
   app:
     build:
       context: '.'
@@ -16,7 +18,11 @@ services:
       - db
     ports:
       - "8080:8080"
+    networks:
+      - application
     volumes:
       - .:/app
     command: 'php bin/console server:run 0.0.0.0:8080'
+networks:
+  application:
 

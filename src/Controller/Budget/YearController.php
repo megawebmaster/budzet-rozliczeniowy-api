@@ -14,7 +14,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 class YearController extends Controller
 {
   /**
-   * @Route("/budgets/{budget_id}", name="budget_years", methods={"GET"})
+   * @Route("/budgets/{budget_slug}", name="budget_years", methods={"GET"})
    * @param Budget $budget
    * @return JsonResponse
    */
@@ -24,7 +24,7 @@ class YearController extends Controller
   }
 
   /**
-   * @Route("/budgets/{budget_id}/{year}", name="budget_year", methods={"GET"}, requirements={"year": "\d{4}"})
+   * @Route("/budgets/{budget_slug}/{year}", name="budget_year", methods={"GET"}, requirements={"year": "\d{4}"})
    * @param Budget $budget
    * @param int $year
    * @return JsonResponse

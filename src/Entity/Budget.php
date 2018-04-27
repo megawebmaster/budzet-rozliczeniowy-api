@@ -24,12 +24,28 @@ class Budget
   private $id;
 
   /**
+   * @var string
+   * @ORM\Column(type="string", length=50)
+   * @Assert\NotBlank
+   * @Groups({"budget", "budget_year"})
+   */
+  private $slug;
+
+  /**
    * @var string Name of the budget.
    * @ORM\Column(type="string", length=50)
    * @Assert\NotBlank
    * @Groups("budget")
    */
   private $name;
+
+  /**
+   * @var boolean Whether this is a default budget for the user.
+   * @ORM\Column(type="boolean", options={"default": false})
+   * @Assert\NotNull
+   * @Groups("budget")
+   */
+  private $isDefault = false;
 
   /**
    * @var Category[] List of categories
@@ -67,7 +83,23 @@ class Budget
   /**
    * @return string
    */
-  public function getUserId(): string
+  public function getSlug(): string
+  {
+    return $this->slug;
+  }
+
+  /**
+   * @param string $slug
+   */
+  public function setSlug(string $slug): void
+  {
+    $this->slug = $slug;
+  }
+
+  /**
+   * @return string
+   */
+  public function getUserId(): ?string
   {
     return $this->userId;
   }
@@ -83,7 +115,7 @@ class Budget
   /**
    * @return string
    */
-  public function getName(): string
+  public function getName(): ?string
   {
     return $this->name;
   }
@@ -94,6 +126,22 @@ class Budget
   public function setName(?string $name): void
   {
     $this->name = $name;
+  }
+
+  /**
+   * @return bool
+   */
+  public function isDefault(): bool
+  {
+    return $this->isDefault;
+  }
+
+  /**
+   * @param bool $isDefault
+   */
+  public function setIsDefault(bool $isDefault): void
+  {
+    $this->isDefault = $isDefault;
   }
 
   /**

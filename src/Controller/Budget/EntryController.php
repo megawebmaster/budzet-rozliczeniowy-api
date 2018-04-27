@@ -22,7 +22,7 @@ class EntryController extends FOSRestController
 {
   /**
    * @Route(
-   *   "/budgets/{budget_id}/{year}/entries",
+   *   "/budgets/{budget_slug}/{year}/entries",
    *   methods={"GET"},
    *   name="budget_entries",
    *   requirements={"year": "\d{4}"}
@@ -40,7 +40,7 @@ class EntryController extends FOSRestController
 
   /**
    * @Route(
-   *   "/budgets/{budget_id}/{year}/entries/{month}",
+   *   "/budgets/{budget_slug}/{year}/entries/{month}",
    *   methods={"GET"},
    *   name="budget_month_entries",
    *   requirements={"year": "\d{4}", "month": "\d\d?"})
@@ -59,7 +59,7 @@ class EntryController extends FOSRestController
   /**
    * TODO: Use `month` parameter as well here to keep URLs consistent
    * @Route(
-   *   "/budgets/{budget_id}/{year}/entries/{category_id}",
+   *   "/budgets/{budget_slug}/{year}/entries/{category_id}",
    *   methods={"PUT"},
    *   name="update_budget_entry",
    *   requirements={"year": "\d{4}"}
@@ -103,7 +103,7 @@ class EntryController extends FOSRestController
 
   /**
    * TODO: Use `month` parameter as well here to keep URLs consistent
-   * @Route("/budgets/{budget_id}/{year}/entries/{id}", methods={"DELETE"}, name="delete_budget_entry")
+   * @Route("/budgets/{budget_slug}/{year}/entries/{id}", methods={"DELETE"}, name="delete_budget_entry")
    * @param BudgetEntry $entry
    * @return Response
    */

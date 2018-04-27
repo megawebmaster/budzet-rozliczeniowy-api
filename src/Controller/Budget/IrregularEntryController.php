@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace App\Controller\Budget;
 
-use App\Entity\Budget;
 use App\Entity\BudgetEntry;
 use App\Entity\BudgetYear;
 use App\Entity\Category;
@@ -16,14 +15,13 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class IrregularEntryController extends FOSRestController
 {
   /**
    * @Route(
-   *   "/budgets/{budget_id}/{year}/irregular",
+   *   "/budgets/{budget_slug}/{year}/irregular",
    *   methods={"GET"},
    *   name="irregular_budget_entries",
    *   requirements={"year": "\d{4}"}
@@ -41,7 +39,7 @@ class IrregularEntryController extends FOSRestController
 
   /**
    * @Route(
-   *   "/budgets/{budget_id}/{year}/irregular/{category_id}",
+   *   "/budgets/{budget_slug}/{year}/irregular/{category_id}",
    *   methods={"PUT"},
    *   name="update_irregular_budget_entry",
    *   requirements={"year": "\d{4}"}
