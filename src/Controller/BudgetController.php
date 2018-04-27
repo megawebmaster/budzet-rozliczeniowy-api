@@ -23,13 +23,22 @@ class BudgetController extends FOSRestController
   {
     /** @var Auth0User $user */
     $user = $this->getUser();
+    $budgets = $this->getRepository()->findBy(['userId' => $user->getId()]);
 
-    return $this->json(
-      $this->getRepository()->findBy(['userId' => $user->getId()]),
-      200,
-      [],
-      ['groups' => ['budget']]
-    );
+    if (empty($budgets)) {
+      $budget = new Budget();
+      $budget->setUserId($user->getId());
+      $budget->setName('Domowy');
+      $budget->setSlug('domowy');
+      $budget->setIsDefault(true);
+
+      $this->getDoctrine()->getManager()->persist($budget);
+      $this->getDoctrine()->getManager()->flush();
+
+      $budgets = [$budget];
+    }
+
+    return $this->json($budgets, 200, [], ['groups' => ['budget']]);
   }
 
   /**
