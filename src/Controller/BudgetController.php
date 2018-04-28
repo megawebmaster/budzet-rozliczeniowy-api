@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Controller\Traits\ErrorRenderTrait;
 use App\Entity\Budget;
 use App\Repository\BudgetRepository;
 use App\Security\User\Auth0User;
@@ -16,6 +17,8 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class BudgetController extends FOSRestController
 {
+  use ErrorRenderTrait;
+
   /** @var ValidatorInterface */
   private $validator;
   /** @var SlugifyInterface */
@@ -81,13 +84,7 @@ class BudgetController extends FOSRestController
 
     if(count($errors) > 0)
     {
-      $result = [];
-      foreach($errors as $error)
-      {
-        $result[$error->getPropertyPath()] = $error->getMessage();
-      }
-
-      return $this->json($result);
+      return $this->renderErrors($errors);
     }
 
     $this->getDoctrine()->getManager()->persist($budget);
@@ -120,13 +117,7 @@ class BudgetController extends FOSRestController
 
     if(count($errors) > 0)
     {
-      $result = [];
-      foreach($errors as $error)
-      {
-        $result[$error->getPropertyPath()] = $error->getMessage();
-      }
-
-      return $this->json($result);
+      return $this->renderErrors($errors);
     }
 
     $this->getDoctrine()->getManager()->persist($budget);

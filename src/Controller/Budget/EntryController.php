@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace App\Controller\Budget;
 
+use App\Controller\Traits\ErrorRenderTrait;
 use App\Entity\BudgetEntry;
 use App\Entity\BudgetYear;
 use App\Entity\Category;
@@ -20,6 +21,8 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class EntryController extends FOSRestController
 {
+  use ErrorRenderTrait;
+
   /** @var ValidatorInterface */
   private $validator;
 
@@ -96,13 +99,7 @@ class EntryController extends FOSRestController
 
     if(count($errors) > 0)
     {
-      $result = [];
-      foreach($errors as $error)
-      {
-        $result[$error->getPropertyPath()] = $error->getMessage();
-      }
-
-      return $this->json($result);
+      return $this->renderErrors($errors);
     }
 
     $em = $this->getDoctrine()->getManager();

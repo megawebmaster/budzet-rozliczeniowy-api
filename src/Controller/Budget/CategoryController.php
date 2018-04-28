@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace App\Controller\Budget;
 
+use App\Controller\Traits\ErrorRenderTrait;
 use App\Entity\Budget;
 use App\Entity\Category;
 use App\Repository\CategoryRepository;
@@ -18,6 +19,8 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class CategoryController extends FOSRestController
 {
+  use ErrorRenderTrait;
+
   /** @var ValidatorInterface */
   private $validator;
 
@@ -81,13 +84,7 @@ class CategoryController extends FOSRestController
 
     if(count($errors) > 0)
     {
-      $result = [];
-      foreach($errors as $error)
-      {
-        $result[$error->getPropertyPath()] = $error->getMessage();
-      }
-
-      return $this->json($result);
+      return $this->renderErrors($errors);
     }
 
     $this->getDoctrine()->getManager()->persist($category);
@@ -113,13 +110,7 @@ class CategoryController extends FOSRestController
 
     if(count($errors) > 0)
     {
-      $result = [];
-      foreach($errors as $error)
-      {
-        $result[$error->getPropertyPath()] = $error->getMessage();
-      }
-
-      return $this->json($result);
+      return $this->renderErrors($errors);
     }
 
     $this->getDoctrine()->getManager()->persist($category);

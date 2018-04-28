@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace App\Controller\Budget;
 
+use App\Controller\Traits\ErrorRenderTrait;
 use App\Entity\BudgetEntry;
 use App\Entity\BudgetExpense;
 use App\Entity\BudgetYear;
@@ -16,11 +17,12 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Validator\ConstraintViolationListInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class ExpenseController extends FOSRestController
 {
+  use ErrorRenderTrait;
+
   /** @var ValidatorInterface */
   private $validator;
 
@@ -222,22 +224,5 @@ class ExpenseController extends FOSRestController
     }
 
     return $entry;
-  }
-
-  /**
-   * TODO: Extract to a trait
-   * @param ConstraintViolationListInterface $errors
-   * @param string $prefix
-   * @return JsonResponse
-   */
-  private function renderErrors(ConstraintViolationListInterface $errors, $prefix = ''): JsonResponse
-  {
-    $result = [];
-    foreach($errors as $error)
-    {
-      $result[$prefix.$error->getPropertyPath()] = $error->getMessage();
-    }
-
-    return $this->json($result, 400);
   }
 }
