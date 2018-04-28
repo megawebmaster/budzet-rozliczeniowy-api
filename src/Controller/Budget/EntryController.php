@@ -20,6 +20,17 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class EntryController extends FOSRestController
 {
+  /** @var ValidatorInterface */
+  private $validator;
+
+  /**
+   * @param ValidatorInterface $validator
+   */
+  public function __construct(ValidatorInterface $validator)
+  {
+    $this->validator = $validator;
+  }
+
   /**
    * @Route(
    *   "/budgets/{budget_slug}/{year}/entries",
@@ -71,17 +82,17 @@ class EntryController extends FOSRestController
    * @param ValidatorInterface $validator
    * @return JsonResponse
    */
-  public function update(BudgetYear $budgetYear, Category $category, Request $request, ValidatorInterface $validator)
+  public function update(BudgetYear $budgetYear, Category $category, Request $request)
   {
     /** @var Auth0User $user */
     $user = $this->getUser();
     $creator = new BudgetEntryCreator($this->getRepository(), $budgetYear, $category, $user);
     $entry = $creator->findAndUpdate(
       $request->get('month'),
-      $request->get('planned'),
-      $request->get('real')
+      $request->get('planned', ''),
+      $request->get('real', '')
     );
-    $errors = $validator->validate($entry);
+    $errors = $this->validator->validate($entry);
 
     if(count($errors) > 0)
     {

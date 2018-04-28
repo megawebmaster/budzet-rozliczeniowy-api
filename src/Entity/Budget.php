@@ -67,7 +67,7 @@ class Budget
   /**
    * @return int
    */
-  public function getId(): int
+  public function getId(): ?int
   {
     return $this->id;
   }
@@ -83,7 +83,7 @@ class Budget
   /**
    * @return string
    */
-  public function getSlug(): string
+  public function getSlug(): ?string
   {
     return $this->slug;
   }
@@ -123,7 +123,7 @@ class Budget
   /**
    * @param string $name
    */
-  public function setName(?string $name): void
+  public function setName(string $name): void
   {
     $this->name = $name;
   }

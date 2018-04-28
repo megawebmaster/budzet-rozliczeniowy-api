@@ -18,6 +18,17 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class CategoryController extends FOSRestController
 {
+  /** @var ValidatorInterface */
+  private $validator;
+
+  /**
+   * @param ValidatorInterface $validator
+   */
+  public function __construct(ValidatorInterface $validator)
+  {
+    $this->validator = $validator;
+  }
+
   /**
    * @Route("/budgets/{budget_slug}/categories", name="categories", methods={"GET"})
    * @ParamConverter("budget")
@@ -33,10 +44,9 @@ class CategoryController extends FOSRestController
    * @Route("/budgets/{budget_slug}/categories", methods={"POST"}, name="new_category")
    * @param Budget $budget
    * @param Request $request
-   * @param ValidatorInterface $validator
    * @return JsonResponse
    */
-  public function create(Budget $budget, Request $request, ValidatorInterface $validator)
+  public function create(Budget $budget, Request $request)
   {
     /** @var Auth0User $user */
     $user = $this->getUser();
@@ -67,7 +77,7 @@ class CategoryController extends FOSRestController
       $category->setParent($parent);
     }
 
-    $errors = $validator->validate($category);
+    $errors = $this->validator->validate($category);
 
     if(count($errors) > 0)
     {
@@ -90,17 +100,16 @@ class CategoryController extends FOSRestController
    * @Route("/budgets/{budget_slug}/categories/{category_id}", methods={"PATCH"}, name="update_category")
    * @param Category $category
    * @param Request $request
-   * @param ValidatorInterface $validator
    * @return JsonResponse
    */
-  public function update(Category $category, Request $request, ValidatorInterface $validator)
+  public function update(Category $category, Request $request)
   {
     $name = $request->get('name');
     if($name)
     {
       $category->setName($name);
     }
-    $errors = $validator->validate($category);
+    $errors = $this->validator->validate($category);
 
     if(count($errors) > 0)
     {

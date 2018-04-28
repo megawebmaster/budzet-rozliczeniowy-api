@@ -19,6 +19,19 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class IrregularEntryController extends FOSRestController
 {
+
+  /** @var ValidatorInterface */
+  private $validator;
+
+  /**
+   * @param ValidatorInterface $validator
+   */
+  public function __construct(ValidatorInterface $validator)
+  {
+
+    $this->validator = $validator;
+  }
+
   /**
    * @Route(
    *   "/budgets/{budget_slug}/{year}/irregular",
@@ -51,15 +64,14 @@ class IrregularEntryController extends FOSRestController
    * @param ValidatorInterface $validator
    * @return JsonResponse
    */
-  public function update(BudgetYear $budgetYear, Category $category, Request $request, ValidatorInterface $validator)
+  public function update(BudgetYear $budgetYear, Category $category, Request $request)
   {
     /** @var Auth0User $user */
     $user = $this->getUser();
     $creator = new BudgetEntryCreator($this->getRepository(), $budgetYear, $category, $user);
-    $plan = $request->get('planned');
-    $real = $request->get('real');
-    $entry = $creator->findAndUpdate(null, $plan, $real);
-    $errors = $validator->validate($entry);
+    $plan = $request->get('planned', '');
+    $entry = $creator->findAndUpdate(null, $plan);
+    $errors = $this->validator->validate($entry);
 
     if(count($errors) > 0)
     {
@@ -75,9 +87,10 @@ class IrregularEntryController extends FOSRestController
     $em = $this->getDoctrine()->getManager();
     $em->persist($entry);
 
+    $plan = $request->get('planned_monthly', '');
     for($month = 1; $month <= 12; $month++)
     {
-      $item = $creator->findAndUpdate($month, $plan ? (float)$plan / 10.0 : 0.0, $real ? (float)$real / 10.0 : 0.0);
+      $item = $creator->findAndUpdate($month, $plan);
       $em->persist($item);
     }
 

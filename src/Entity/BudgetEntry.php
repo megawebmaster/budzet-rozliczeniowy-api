@@ -45,16 +45,16 @@ class BudgetEntry
   private $month;
 
   /**
-   * @var float Planned value
-   * @ORM\Column(type="decimal", precision=8, scale=2)
+   * @var string Planned value
+   * @ORM\Column(type="text")
    * @Assert\NotBlank
    * @Groups({"entry", "budget"})
    */
   private $plan;
 
   /**
-   * @var float Real value
-   * @ORM\Column(type="decimal", precision=8, scale=2)
+   * @var string Real value
+   * @ORM\Column(type="text")
    * @Assert\NotBlank
    * @Groups({"entry", "budget"})
    */
@@ -65,15 +65,6 @@ class BudgetEntry
    * @ORM\Column(type="string", length=50, nullable=false)
    */
   private $creatorId;
-
-  /**
-   * BudgetEntry constructor.
-   */
-  public function __construct()
-  {
-    $this->plan = 0.0;
-    $this->real = 0.0;
-  }
 
   public function getId(): ?int
   {
@@ -88,7 +79,7 @@ class BudgetEntry
   /**
    * @return string
    */
-  public function getCreatorId(): string
+  public function getCreatorId(): ?string
   {
     return $this->creatorId;
   }
@@ -101,7 +92,7 @@ class BudgetEntry
     $this->creatorId = $creatorId;
   }
 
-  public function getBudgetYear(): BudgetYear
+  public function getBudgetYear(): ?BudgetYear
   {
     return $this->budgetYear;
   }
@@ -111,7 +102,7 @@ class BudgetEntry
     $this->budgetYear = $budgetYear;
   }
 
-  public function getCategory(): Category
+  public function getCategory(): ?Category
   {
     return $this->category;
   }
@@ -131,38 +122,23 @@ class BudgetEntry
     $this->month = $month;
   }
 
-  public function getPlan(): float
+  public function getPlan(): ?string
   {
-    return (float)$this->plan;
+    return $this->plan;
   }
 
-  public function setPlan(float $plan): void
+  public function setPlan(string $plan): void
   {
     $this->plan = $plan;
   }
 
-  public function getReal(): float
+  public function getReal(): ?string
   {
-    return (float)$this->real;
+    return $this->real;
   }
 
-  public function setReal(float $real): void
+  public function setReal(string $real): void
   {
     $this->real = $real;
-  }
-
-  public function addReal(float $value): void
-  {
-    $this->real += $value;
-  }
-
-  public function updateReal(float $old, float $new): void
-  {
-    $this->real += $new - $old;
-  }
-
-  public function subtractReal(float $value): void
-  {
-    $this->real -= $value;
   }
 }

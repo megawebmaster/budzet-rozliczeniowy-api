@@ -16,6 +16,21 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class BudgetController extends FOSRestController
 {
+  /** @var ValidatorInterface */
+  private $validator;
+  /** @var SlugifyInterface */
+  private $slugify;
+
+  /**
+   * @param ValidatorInterface $validator
+   * @param SlugifyInterface $slugify
+   */
+  public function __construct(ValidatorInterface $validator, SlugifyInterface $slugify)
+  {
+    $this->validator = $validator;
+    $this->slugify = $slugify;
+  }
+
   /**
    * @Route("/budgets", name="budgets", methods={"GET"})
    */
@@ -44,16 +59,14 @@ class BudgetController extends FOSRestController
   /**
    * @Route("/budgets", methods={"POST"}, name="new_budget")
    * @param Request $request
-   * @param ValidatorInterface $validator
-   * @param SlugifyInterface $slugify
    * @return JsonResponse
    */
-  public function create(Request $request, ValidatorInterface $validator, SlugifyInterface $slugify)
+  public function create(Request $request)
   {
     /** @var Auth0User $user */
     $user = $this->getUser();
     $name = $request->get('name');
-    $slug = $slugify->slugify($name);
+    $slug = $this->slugify->slugify($name);
     $budget = $this->getRepository()->findOneByOrNew([
       'slug' => $slug,
       'userId' => $user->getId(),
@@ -64,7 +77,7 @@ class BudgetController extends FOSRestController
     $budget->setIsDefault($request->get('make_default') ? true : false);
     $budget->setUserId($user->getId());
 
-    $errors = $validator->validate($budget);
+    $errors = $this->validator->validate($budget);
 
     if(count($errors) > 0)
     {
@@ -87,16 +100,14 @@ class BudgetController extends FOSRestController
    * @Route("/budgets/{budget_id}", methods={"PATCH"}, name="update_budget")
    * @param Budget $budget
    * @param Request $request
-   * @param ValidatorInterface $validator
-   * @param SlugifyInterface $slugify
    * @return JsonResponse
    */
-  public function update(Budget $budget, Request $request, ValidatorInterface $validator, SlugifyInterface $slugify)
+  public function update(Budget $budget, Request $request)
   {
     $name = $request->get('name');
     if($name)
     {
-      $slug = $slugify->slugify($name);
+      $slug = $this->slugify->slugify($name);
       $budget->setName($name);
       $budget->setSlug($slug);
     }
@@ -105,7 +116,7 @@ class BudgetController extends FOSRestController
     {
       $budget->setIsDefault($isDefault ? true : false);
     }
-    $errors = $validator->validate($budget);
+    $errors = $this->validator->validate($budget);
 
     if(count($errors) > 0)
     {

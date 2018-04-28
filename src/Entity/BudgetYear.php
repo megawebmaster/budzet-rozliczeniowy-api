@@ -61,7 +61,7 @@ class BudgetYear
   /**
    * @return int
    */
-  public function getId(): int
+  public function getId(): ?int
   {
     return $this->id;
   }
@@ -74,7 +74,7 @@ class BudgetYear
     $this->id = $id;
   }
 
-  public function getBudget(): Budget
+  public function getBudget(): ?Budget
   {
     return $this->budget;
   }
@@ -87,7 +87,7 @@ class BudgetYear
   /**
    * @return int
    */
-  public function getYear(): int
+  public function getYear(): ?int
   {
     return $this->year;
   }

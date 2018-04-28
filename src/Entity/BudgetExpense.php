@@ -46,15 +46,15 @@ class BudgetExpense
 
   /**
    * @var integer Day this expense was made.
-   * @ORM\Column(type="integer")
+   * @ORM\Column(type="integer", nullable=true)
    * @Assert\Range(min="1", max="31")
    * @Groups({"expense", "budget"})
    */
   private $day;
 
   /**
-   * @var double Expense value
-   * @ORM\Column(type="decimal", precision=8, scale=2)
+   * @var string Expense value
+   * @ORM\Column(type="text")
    * @Assert\NotBlank
    * @Groups({"expense", "budget"})
    */
@@ -73,7 +73,7 @@ class BudgetExpense
    */
   private $creatorId;
 
-  public function getId(): int
+  public function getId(): ?int
   {
     return $this->id;
   }
@@ -83,7 +83,7 @@ class BudgetExpense
     $this->id = $id;
   }
 
-  public function getCreatorId(): string
+  public function getCreatorId(): ?string
   {
     return $this->creatorId;
   }
@@ -93,7 +93,7 @@ class BudgetExpense
     $this->creatorId = $creatorId;
   }
 
-  public function getBudgetYear(): BudgetYear
+  public function getBudgetYear(): ?BudgetYear
   {
     return $this->budgetYear;
   }
@@ -103,7 +103,7 @@ class BudgetExpense
     $this->budgetYear = $budgetYear;
   }
 
-  public function getCategory(): Category
+  public function getCategory(): ?Category
   {
     return $this->category;
   }
@@ -113,7 +113,7 @@ class BudgetExpense
     $this->category = $category;
   }
 
-  public function getMonth(): int
+  public function getMonth(): ?int
   {
     return $this->month;
   }
@@ -123,27 +123,27 @@ class BudgetExpense
     $this->month = $month;
   }
 
-  public function getDay(): int
+  public function getDay(): ?int
   {
     return $this->day;
   }
 
-  public function setDay(int $day): void
+  public function setDay(?int $day): void
   {
     $this->day = $day;
   }
 
-  public function getValue(): float
+  public function getValue(): ?string
   {
-    return (float)$this->value;
+    return $this->value;
   }
 
-  public function setValue(float $value): void
+  public function setValue(string $value): void
   {
     $this->value = $value;
   }
 
-  public function getDescription(): string
+  public function getDescription(): ?string
   {
     return $this->description;
   }

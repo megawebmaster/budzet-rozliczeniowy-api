@@ -32,7 +32,7 @@ class BudgetEntryCreator
     $this->user = $user;
   }
 
-  public function findAndUpdate(?int $month, $plan, $real): BudgetEntry
+  public function findAndUpdate(?int $month, ?string $plan, ?string $real = null): BudgetEntry
   {
     $entry = $this->repository->findOneByOrNew([
       'budgetYear' => $this->budgetYear,
@@ -50,12 +50,12 @@ class BudgetEntryCreator
 
     if($plan)
     {
-      $entry->setPlan((float)$plan);
+      $entry->setPlan($plan);
     }
 
     if($real)
     {
-      $entry->setReal((float)$real);
+      $entry->setReal($real);
     }
 
     return $entry;

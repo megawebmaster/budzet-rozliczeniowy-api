@@ -8,7 +8,7 @@ use Doctrine\DBAL\Schema\Schema;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-class Version20180422190051 extends AbstractMigration
+class Version20180428174232 extends AbstractMigration
 {
     public function up(Schema $schema)
     {
@@ -20,16 +20,16 @@ class Version20180422190051 extends AbstractMigration
         $this->addSql('CREATE SEQUENCE budget_expense_id_seq INCREMENT BY 1 MINVALUE 1 START 1');
         $this->addSql('CREATE SEQUENCE budget_year_id_seq INCREMENT BY 1 MINVALUE 1 START 1');
         $this->addSql('CREATE SEQUENCE budget_entry_id_seq INCREMENT BY 1 MINVALUE 1 START 1');
-        $this->addSql('CREATE TABLE category (id INT NOT NULL, budget_id INT DEFAULT NULL, parent_id INT DEFAULT NULL, name VARCHAR(50) NOT NULL, type VARCHAR(255) NOT NULL, created_at TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, started_at TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, deleted_at TIMESTAMP(0) WITHOUT TIME ZONE DEFAULT NULL, creator_id VARCHAR(50) NOT NULL, PRIMARY KEY(id))');
+        $this->addSql('CREATE TABLE category (id INT NOT NULL, budget_id INT DEFAULT NULL, parent_id INT DEFAULT NULL, name TEXT NOT NULL, type VARCHAR(255) NOT NULL, created_at TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, started_at TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, deleted_at TIMESTAMP(0) WITHOUT TIME ZONE DEFAULT NULL, creator_id VARCHAR(50) NOT NULL, PRIMARY KEY(id))');
         $this->addSql('CREATE INDEX IDX_64C19C136ABA6B8 ON category (budget_id)');
         $this->addSql('CREATE INDEX IDX_64C19C1727ACA70 ON category (parent_id)');
-        $this->addSql('CREATE TABLE budget (id INT NOT NULL, name VARCHAR(50) NOT NULL, user_id VARCHAR(50) NOT NULL, PRIMARY KEY(id))');
-        $this->addSql('CREATE TABLE budget_expense (id INT NOT NULL, budget_year_id INT DEFAULT NULL, category_id INT DEFAULT NULL, month INT NOT NULL, day INT NOT NULL, value NUMERIC(8, 2) NOT NULL, description TEXT NOT NULL, creator_id VARCHAR(50) NOT NULL, PRIMARY KEY(id))');
+        $this->addSql('CREATE TABLE budget (id INT NOT NULL, slug VARCHAR(50) NOT NULL, name VARCHAR(50) NOT NULL, is_default BOOLEAN DEFAULT \'false\' NOT NULL, user_id VARCHAR(50) NOT NULL, PRIMARY KEY(id))');
+        $this->addSql('CREATE TABLE budget_expense (id INT NOT NULL, budget_year_id INT DEFAULT NULL, category_id INT DEFAULT NULL, month INT NOT NULL, day INT DEFAULT NULL, value TEXT NOT NULL, description TEXT NOT NULL, creator_id VARCHAR(50) NOT NULL, PRIMARY KEY(id))');
         $this->addSql('CREATE INDEX IDX_EFB9C7478242B446 ON budget_expense (budget_year_id)');
         $this->addSql('CREATE INDEX IDX_EFB9C74712469DE2 ON budget_expense (category_id)');
         $this->addSql('CREATE TABLE budget_year (id INT NOT NULL, budget_id INT DEFAULT NULL, year INT NOT NULL, PRIMARY KEY(id))');
         $this->addSql('CREATE INDEX IDX_C146716736ABA6B8 ON budget_year (budget_id)');
-        $this->addSql('CREATE TABLE budget_entry (id INT NOT NULL, budget_year_id INT DEFAULT NULL, category_id INT DEFAULT NULL, month INT DEFAULT NULL, plan NUMERIC(8, 2) NOT NULL, real NUMERIC(8, 2) NOT NULL, creator_id VARCHAR(50) NOT NULL, PRIMARY KEY(id))');
+        $this->addSql('CREATE TABLE budget_entry (id INT NOT NULL, budget_year_id INT DEFAULT NULL, category_id INT DEFAULT NULL, month INT DEFAULT NULL, plan TEXT NOT NULL, real TEXT NOT NULL, creator_id VARCHAR(50) NOT NULL, PRIMARY KEY(id))');
         $this->addSql('CREATE INDEX IDX_403008868242B446 ON budget_entry (budget_year_id)');
         $this->addSql('CREATE INDEX IDX_4030088612469DE2 ON budget_entry (category_id)');
         $this->addSql('ALTER TABLE category ADD CONSTRAINT FK_64C19C136ABA6B8 FOREIGN KEY (budget_id) REFERENCES budget (id) NOT DEFERRABLE INITIALLY IMMEDIATE');

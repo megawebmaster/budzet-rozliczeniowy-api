@@ -16,10 +16,22 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Validator\Validator\ValidatorInterface as Validator;
+use Symfony\Component\Validator\ConstraintViolationListInterface;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class ExpenseController extends FOSRestController
 {
+  /** @var ValidatorInterface */
+  private $validator;
+
+  /**
+   * @param ValidatorInterface $validator
+   */
+  public function __construct(ValidatorInterface $validator)
+  {
+    $this->validator = $validator;
+  }
+
   /**
    * @Route(
    *   "/budgets/{budget_slug}/{year}/expenses/{month}",
@@ -51,10 +63,9 @@ class ExpenseController extends FOSRestController
    * @param Category $category
    * @param int $month
    * @param Request $request
-   * @param Validator $validator
    * @return JsonResponse
    */
-  public function create(BudgetYear $budgetYear, Category $category, int $month, Request $request, Validator $validator)
+  public function create(BudgetYear $budgetYear, Category $category, int $month, Request $request)
   {
     /** @var Auth0User $user */
     $user = $this->getUser();
@@ -62,25 +73,26 @@ class ExpenseController extends FOSRestController
     $expense->setBudgetYear($budgetYear);
     $expense->setCategory($category);
     $expense->setMonth($month);
-    $expense->setValue((float)$request->get('value'));
+    $expense->setValue($request->get('value', ''));
     $expense->setDay((int)$request->get('day'));
-    $expense->setDescription($request->get('description'));
+    $expense->setDescription($request->get('description', ''));
     $expense->setCreatorId($user->getId());
 
-    $errors = $validator->validate($expense);
+    $errors = $this->validator->validate($expense);
     if(count($errors) > 0)
     {
-      $result = [];
-      foreach($errors as $error)
-      {
-        $result[$error->getPropertyPath()] = $error->getMessage();
-      }
-
-      return $this->json($result);
+      return $this->renderErrors($errors);
     }
 
-    $entry = $this->getMatchingEntry($budgetYear, $month, $category);
-    $entry->addReal($expense->getValue());
+    $value = $request->get('budget_value');
+    $entry = $this->getMatchingEntry($expense->getBudgetYear(), $expense->getMonth(), $category);
+    $entry->setReal($value);
+
+    $errors = $this->validator->validate($entry);
+    if(count($errors) > 0)
+    {
+      return $this->renderErrors($errors, 'budget_');
+    }
 
     $this->getDoctrine()->getManager()->persist($entry);
     $this->getDoctrine()->getManager()->persist($expense);
@@ -100,21 +112,19 @@ class ExpenseController extends FOSRestController
    * @param BudgetExpense $expense
    * @param Category $category
    * @param Request $request
-   * @param Validator $validator
    * @return JsonResponse
    */
-  public function update(BudgetExpense $expense, Category $category, Request $request, Validator $validator)
+  public function update(BudgetExpense $expense, Category $category, Request $request)
   {
     if($category)
     {
       $expense->setCategory($category);
     }
 
-    $currentValue = $expense->getValue();
     $value = $request->get('value');
     if($value)
     {
-      $expense->setValue((float)$value);
+      $expense->setValue($value);
     }
 
     $day = $request->get('day');
@@ -129,20 +139,21 @@ class ExpenseController extends FOSRestController
       $expense->setDescription($description);
     }
 
-    $errors = $validator->validate($expense);
+    $errors = $this->validator->validate($expense);
     if(count($errors) > 0)
     {
-      $result = [];
-      foreach($errors as $error)
-      {
-        $result[$error->getPropertyPath()] = $error->getMessage();
-      }
-
-      return $this->json($result);
+      return $this->renderErrors($errors);
     }
 
+    $value = $request->get('budget_value');
     $entry = $this->getMatchingEntry($expense->getBudgetYear(), $expense->getMonth(), $category);
-    $entry->updateReal($currentValue, $expense->getValue());
+    $entry->setReal($value);
+
+    $errors = $this->validator->validate($entry);
+    if(count($errors) > 0)
+    {
+      return $this->renderErrors($errors, 'budget_');
+    }
 
     $this->getDoctrine()->getManager()->persist($entry);
     $this->getDoctrine()->getManager()->persist($expense);
@@ -154,9 +165,10 @@ class ExpenseController extends FOSRestController
   /**
    * @Route("/budgets/{budget_slug}/{year}/expenses/{month}/{id}", methods={"DELETE"}, name="delete_budget_expense")
    * @param BudgetExpense $expense
+   * @param Request $request
    * @return Response
    */
-  public function delete(BudgetExpense $expense)
+  public function delete(BudgetExpense $expense, Request $request)
   {
     /** @var Auth0User $user */
     $user = $this->getUser();
@@ -165,8 +177,15 @@ class ExpenseController extends FOSRestController
       return new Response('', 403);
     }
 
+    $value = $request->get('budget_value');
     $entry = $this->getMatchingEntry($expense->getBudgetYear(), $expense->getMonth(), $expense->getCategory());
-    $entry->subtractReal($expense->getValue());
+    $entry->setReal($value);
+
+    $errors = $this->validator->validate($entry);
+    if(count($errors) > 0)
+    {
+      return $this->renderErrors($errors, 'budget_');
+    }
 
     $this->getDoctrine()->getManager()->persist($entry);
     $this->getDoctrine()->getManager()->remove($expense);
@@ -203,5 +222,22 @@ class ExpenseController extends FOSRestController
     }
 
     return $entry;
+  }
+
+  /**
+   * TODO: Extract to a trait
+   * @param ConstraintViolationListInterface $errors
+   * @param string $prefix
+   * @return JsonResponse
+   */
+  private function renderErrors(ConstraintViolationListInterface $errors, $prefix = ''): JsonResponse
+  {
+    $result = [];
+    foreach($errors as $error)
+    {
+      $result[$prefix.$error->getPropertyPath()] = $error->getMessage();
+    }
+
+    return $this->json($result, 400);
   }
 }

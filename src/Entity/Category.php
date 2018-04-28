@@ -36,7 +36,7 @@ class Category
 
   /**
    * @var string Name of the category.
-   * @ORM\Column(type="string", length=50)
+   * @ORM\Column(type="text")
    * @Assert\NotBlank()
    * @Groups("category")
    */
@@ -92,10 +92,10 @@ class Category
   private $creatorId;
 
   /**
-   * @var float Average value from last 12 months of expenses.
+   * @var string[] Values from last 12 months of expenses.
    * @Groups("category")
    */
-  private $averageValue = 0.0;
+  private $averageValues = [];
 
   public static function getTypes(): array
   {
@@ -125,7 +125,7 @@ class Category
     $this->id = $id;
   }
 
-  public function getCreatorId(): string
+  public function getCreatorId(): ?string
   {
     return $this->creatorId;
   }
@@ -135,7 +135,7 @@ class Category
     $this->creatorId = $creatorId;
   }
 
-  public function getBudget(): Budget
+  public function getBudget(): ?Budget
   {
     return $this->budget;
   }
@@ -145,7 +145,7 @@ class Category
     $this->budget = $budget;
   }
 
-  public function getName(): string
+  public function getName(): ?string
   {
     return $this->name;
   }
@@ -155,7 +155,7 @@ class Category
     $this->name = $name;
   }
 
-  public function getType(): string
+  public function getType(): ?string
   {
     return $this->type;
   }
@@ -200,13 +200,13 @@ class Category
     $this->deletedAt = $deletedAt;
   }
 
-  public function getAverageValue(): ?float
+  public function getAverageValues(): array
   {
-    return $this->averageValue;
+    return $this->averageValues;
   }
 
-  public function setAverageValue(float $averageValue): void
+  public function setAverageValues(array $averageValues): void
   {
-    $this->averageValue = $averageValue;
+    $this->averageValues = $averageValues;
   }
 }
