@@ -47,18 +47,18 @@ class BudgetEntry
   /**
    * @var string Planned value
    * @ORM\Column(type="text")
-   * @Assert\NotBlank
+   * @Assert\NotNull
    * @Groups({"entry", "budget"})
    */
-  private $plan;
+  private $plan = '';
 
   /**
    * @var string Real value
    * @ORM\Column(type="text")
-   * @Assert\NotBlank
+   * @Assert\NotNull
    * @Groups({"entry", "budget"})
    */
-  private $real;
+  private $real = '';
 
   /**
    * @var string Creator's ID

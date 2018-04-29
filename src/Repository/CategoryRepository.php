@@ -31,7 +31,7 @@ class CategoryRepository extends ServiceEntityRepository
   public function findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
   {
     $averages = $this->getAverageExpenses();
-    dump($averages);
+//    dump($averages);
 
     /** @var Category[] $results */
     $results = parent::findBy($criteria, ['id' => 'ASC']);
@@ -61,7 +61,6 @@ SELECT e.category_id, e.real FROM (
   LEFT JOIN budget_year db ON db.id = d.budget_year_id
 ) AS e
 WHERE e.rank <= 12
-GROUP BY e.category_id
 SQL;
     $mapping = new ResultSetMapping();
     $mapping->addScalarResult('real', 'real');

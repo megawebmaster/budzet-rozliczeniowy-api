@@ -86,9 +86,8 @@ class ExpenseController extends FOSRestController
       return $this->renderErrors($errors);
     }
 
-    $value = $request->get('budget_value');
-    $entry = $this->getMatchingEntry($expense->getBudgetYear(), $expense->getMonth(), $category);
-    $entry->setReal($value);
+    $entry = $this->getMatchingEntry($budgetYear, $month, $category);
+    $entry->setReal($request->get('budget_value', ''));
 
     $errors = $this->validator->validate($entry);
     if(count($errors) > 0)
@@ -147,9 +146,8 @@ class ExpenseController extends FOSRestController
       return $this->renderErrors($errors);
     }
 
-    $value = $request->get('budget_value');
     $entry = $this->getMatchingEntry($expense->getBudgetYear(), $expense->getMonth(), $category);
-    $entry->setReal($value);
+    $entry->setReal($request->get('budget_value', ''));
 
     $errors = $this->validator->validate($entry);
     if(count($errors) > 0)
@@ -158,6 +156,7 @@ class ExpenseController extends FOSRestController
     }
 
     $this->getDoctrine()->getManager()->persist($entry);
+
     $this->getDoctrine()->getManager()->persist($expense);
     $this->getDoctrine()->getManager()->flush();
 
@@ -176,12 +175,11 @@ class ExpenseController extends FOSRestController
     $user = $this->getUser();
     if($expense->getCreatorId() !== $user->getId())
     {
-      return new Response('', 403);
+      return new JsonResponse(['error' => 'Invalid user ID'], 403);
     }
 
-    $value = $request->get('budget_value');
     $entry = $this->getMatchingEntry($expense->getBudgetYear(), $expense->getMonth(), $expense->getCategory());
-    $entry->setReal($value);
+    $entry->setReal($request->get('budget_value', ''));
 
     $errors = $this->validator->validate($entry);
     if(count($errors) > 0)
@@ -193,7 +191,7 @@ class ExpenseController extends FOSRestController
     $this->getDoctrine()->getManager()->remove($expense);
     $this->getDoctrine()->getManager()->flush();
 
-    return new Response();
+    return new JsonResponse(['success' => true]);
   }
 
   /**
