@@ -127,10 +127,18 @@ class CategoryController extends FOSRestController
    */
   public function delete(Category $category, Request $request)
   {
-    $category->setDeletedAt(new \DateTime($request->get('year').'-'.$request->get('month', '01').'-01'));
-    // TODO: Delete all it's children as well
-    $this->getDoctrine()->getManager()->persist($category);
-    $this->getDoctrine()->getManager()->flush();
+    $em = $this->getDoctrine()->getManager();
+    $deletedAt = new \DateTime($request->get('year').'-'.$request->get('month', '01').'-01');
+    $category->setDeletedAt($deletedAt);
+
+    foreach ($this->getRepository()->findBy(['parent' => $category]) as $subcategory)
+    {
+      $subcategory->setDeletedAt($deletedAt);
+      $em->persist($subcategory);
+    }
+
+    $em->persist($category);
+    $em->flush();
 
     return new Response();
   }
