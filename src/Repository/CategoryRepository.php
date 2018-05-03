@@ -31,18 +31,17 @@ class CategoryRepository extends ServiceEntityRepository
   public function findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
   {
     $averages = $this->getAverageExpenses();
-//    dump($averages);
 
     /** @var Category[] $results */
     $results = parent::findBy($criteria, ['id' => 'ASC']);
 
-//    foreach($results as $result)
-//    {
-//      if (isset($averages[$result->getId()]))
-//      {
-//        $result->setAverageValues($averages[$result->getId()]['average']);
-//      }
-//    }
+    foreach($results as $result)
+    {
+      if (isset($averages[$result->getId()]))
+      {
+        $result->setAverageValues($averages[$result->getId()]);
+      }
+    }
 
     return $results;
   }
@@ -55,20 +54,30 @@ class CategoryRepository extends ServiceEntityRepository
 // TODO: Check for proper users support
     $averagesQuery = <<<SQL
 SELECT e.category_id, e.real FROM (
-  SELECT d.category_id, d.real, 
+  SELECT d.category_id, d.real, d.month, db.year, 
     row_number() OVER (PARTITION BY d.category_id ORDER BY db.year DESC, d.month DESC) AS rank
   FROM budget_entry d
   LEFT JOIN budget_year db ON db.id = d.budget_year_id
 ) AS e
-WHERE e.rank <= 12
+WHERE e.rank <= 12 AND e.real != ''
 SQL;
     $mapping = new ResultSetMapping();
     $mapping->addScalarResult('real', 'real');
-    $mapping->addIndexByScalar('category_id');
+    $mapping->addScalarResult('category_id', 'category_id');
 
-    $averages = $this->getEntityManager()
+    $results = $this->getEntityManager()
       ->createNativeQuery($averagesQuery, $mapping)
       ->getResult(AbstractQuery::HYDRATE_ARRAY);
+
+    $averages = [];
+    foreach ($results as $result) {
+      if (!isset($averages[$result['category_id']]))
+      {
+        $averages[$result['category_id']] = [];
+      }
+
+      $averages[$result['category_id']][] = $result['real'];
+    }
 
     return $averages;
   }
