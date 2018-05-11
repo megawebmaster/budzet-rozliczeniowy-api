@@ -63,6 +63,7 @@ class BudgetEntry
   /**
    * @var string Creator's ID
    * @ORM\Column(type="string", length=50, nullable=false)
+   * @Assert\NotBlank()
    */
   private $creatorId;
 
