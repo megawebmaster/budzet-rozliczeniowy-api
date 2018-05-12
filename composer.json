@@ -69,6 +69,7 @@
         "symfony": {
             "id": "01C5ZYMX3R11T5FTDWN4KVEANT",
             "allow-contrib": false
-        }
+        },
+        "public-dir": "private_html",
     }
 }
