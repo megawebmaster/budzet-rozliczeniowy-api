@@ -1,14 +1,23 @@
 version: '2'
 services:
   db:
-    image: postgres:9.6-alpine
+    image: yobasystems/alpine-mariadb
     environment:
-      POSTGRES_PASSWORD: example
-      POSTGRES_DB: budzet
+      MYSQL_ROOT_PASSWORD: example
+      MYSQL_DATABASE: budzet
     ports:
-      - "5432:5432"
+      - "3306:3306"
     networks:
       - application
+#  db:
+#    image: postgres:9.6-alpine
+#    environment:
+#      POSTGRES_PASSWORD: example
+#      POSTGRES_DB: budzet
+#    ports:
+#      - "5432:5432"
+#    networks:
+#      - application
   app:
     build:
       context: '.'

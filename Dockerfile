@@ -13,8 +13,8 @@ RUN ln -s /usr/bin/composer.phar /usr/local/bin/composer
 
 # Install required dependencies (MySQL and XDebug)
 RUN apk --no-cache add autoconf gcc g++ musl-dev libc-dev make
-RUN apk --no-cache add postgresql-dev
-RUN docker-php-ext-install pdo_pgsql
+RUN apk --no-cache add mariadb-dev
+RUN docker-php-ext-install pdo_mysql
 RUN pecl install 'xdebug-2.6.0'
 RUN apk del autoconf gcc g++ musl-dev libc-dev make
 RUN apk --no-cache add git

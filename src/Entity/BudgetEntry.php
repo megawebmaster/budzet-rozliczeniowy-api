@@ -46,7 +46,7 @@ class BudgetEntry
 
   /**
    * @var string Planned value
-   * @ORM\Column(type="text")
+   * @ORM\Column(type="text", name="planned_value")
    * @Assert\NotNull
    * @Groups({"entry", "budget"})
    */
@@ -54,7 +54,7 @@ class BudgetEntry
 
   /**
    * @var string Real value
-   * @ORM\Column(type="text")
+   * @ORM\Column(type="text", name="real_value")
    * @Assert\NotNull
    * @Groups({"entry", "budget"})
    */
