@@ -175,7 +175,7 @@ class ExpenseController extends FOSRestController
     $user = $this->getUser();
     if($expense->getCreatorId() !== $user->getId())
     {
-      return new JsonResponse(['error' => 'Invalid user ID'], 403);
+      return new JsonResponse(['error' => 'Invalid user ID'], 403); // TODO: Properly translate this message
     }
 
     $entry = $this->getMatchingEntry($expense->getBudgetYear(), $expense->getMonth(), $expense->getCategory());
