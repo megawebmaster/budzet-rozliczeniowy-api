@@ -54,13 +54,7 @@ class CategoryController extends FOSRestController
     /** @var Auth0User $user */
     $user = $this->getUser();
     $parentId = $request->get('parent_id');
-    $category = $this->getRepository()->findOneByOrNew([
-      'name' => $request->get('name'),
-      'type' => $request->get('type'),
-      'parent' => $parentId,
-      'budget' => $budget
-    ]);
-
+    $category = new Category();
     $category->setName($request->get('name'));
     $category->setType($request->get('type'));
     $category->setBudget($budget);
@@ -106,8 +100,14 @@ class CategoryController extends FOSRestController
     {
       $category->setName($name);
     }
-    $errors = $this->validator->validate($category);
 
+    $startedAt = new \DateTime($request->get('year', date('Y')).'-'.$request->get('month', date('m')).'-01');
+    if(!$category->getStartedAt() || $category->getStartedAt() > $startedAt)
+    {
+      $category->setStartedAt($startedAt);
+    }
+
+    $errors = $this->validator->validate($category);
     if(count($errors) > 0)
     {
       return $this->renderErrors($errors);
@@ -131,13 +131,29 @@ class CategoryController extends FOSRestController
     $deletedAt = new \DateTime($request->get('year').'-'.$request->get('month', '01').'-01');
     $category->setDeletedAt($deletedAt);
 
-    foreach ($this->getRepository()->findBy(['parent' => $category]) as $subcategory)
+    foreach($this->getRepository()->findBy(['parent' => $category]) as $subcategory)
     {
       $subcategory->setDeletedAt($deletedAt);
-      $em->persist($subcategory);
+
+      if($subcategory->getStartedAt() == $subcategory->getDeletedAt())
+      {
+        $em->remove($subcategory);
+      }
+      else
+      {
+        $em->persist($subcategory);
+      }
     }
 
-    $em->persist($category);
+    if($category->getStartedAt() == $category->getDeletedAt())
+    {
+      $em->remove($category);
+    }
+    else
+    {
+      $em->persist($category);
+    }
+
     $em->flush();
 
     return new Response();

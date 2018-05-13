@@ -65,6 +65,18 @@ class Category
   private $subcategories;
 
   /**
+   * @var BudgetEntry[] Entries list.
+   * @ORM\OneToMany(targetEntity="BudgetEntry", mappedBy="category")
+   */
+  private $entries;
+
+  /**
+   * @var BudgetExpense[] Expenses list.
+   * @ORM\OneToMany(targetEntity="BudgetExpense", mappedBy="category")
+   */
+  private $expenses;
+
+  /**
    * @var \DateTime Creation time.
    * @ORM\Column(type="datetime")
    * @Groups("category")
@@ -105,6 +117,8 @@ class Category
   public function __construct()
   {
     $this->subcategories = new ArrayCollection();
+    $this->entries = new ArrayCollection();
+    $this->expenses = new ArrayCollection();
   }
 
   /**

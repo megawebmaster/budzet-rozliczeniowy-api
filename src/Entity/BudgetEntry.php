@@ -31,6 +31,7 @@ class BudgetEntry
   /**
    * @var Category Category ID this entry belongs to.
    * @ORM\ManyToOne(targetEntity="Category")
+   * @ORM\JoinColumn(name="category_id", referencedColumnName="id", onDelete="CASCADE")
    * @Assert\NotBlank
    * @Groups({"entry", "budget"})
    */
