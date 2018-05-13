@@ -30,18 +30,21 @@ class CategoryRepository extends ServiceEntityRepository
 
   public function findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
   {
-    /** @var int $budget */
-    $budget = $criteria['budget']->getId();
-    $averages = $this->getAverageExpenses($budget);
-
     /** @var Category[] $results */
     $results = parent::findBy($criteria, ['id' => 'ASC']);
 
-    foreach($results as $result)
+    if (isset($criteria['budget']))
     {
-      if (isset($averages[$result->getId()]))
+      /** @var int $budget */
+      $budget = $criteria['budget']->getId();
+      $averages = $this->getAverageExpenses($budget);
+
+      foreach($results as $result)
       {
-        $result->setAverageValues($averages[$result->getId()]);
+        if (isset($averages[$result->getId()]))
+        {
+          $result->setAverageValues($averages[$result->getId()]);
+        }
       }
     }
 
