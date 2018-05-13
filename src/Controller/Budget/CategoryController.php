@@ -107,6 +107,11 @@ class CategoryController extends FOSRestController
       $category->setStartedAt($startedAt);
     }
 
+    if($category->getDeletedAt() && $category->getDeletedAt() < $startedAt)
+    {
+      $category->setDeletedAt(null);
+    }
+
     $errors = $this->validator->validate($category);
     if(count($errors) > 0)
     {
