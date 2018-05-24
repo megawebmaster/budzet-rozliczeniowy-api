@@ -33,7 +33,8 @@ class BudgetYear
   /**
    * @var integer Year the budget is for.
    * @ORM\Column(type="integer")
-   * @Assert\NotBlank
+   * @Assert\NotBlank(message="budget_year.year.invalid")
+   * @Assert\GreaterThan(value="0", message="budget_year.year.positive")
    * @Groups("budget_year")
    */
   private $year;

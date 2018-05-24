@@ -32,7 +32,7 @@ class BudgetExpense
    * @var Category
    * @ORM\ManyToOne(targetEntity="Category")
    * @ORM\JoinColumn(name="category_id", referencedColumnName="id", onDelete="CASCADE")
-   * @Assert\NotBlank
+   * @Assert\NotBlank(message="budget_expense.category.invalid")
    * @Groups({"expense", "budget"})
    */
   private $category;
@@ -40,7 +40,12 @@ class BudgetExpense
   /**
    * @var integer Month this expense was made.
    * @ORM\Column(type="integer")
-   * @Assert\Range(min="1", max="12")
+   * @Assert\Range(
+   *   min="1",
+   *   max="12",
+   *   minMessage="budget_expense.month.invalid",
+   *   maxMessage="budget_expense.month.invalid"
+   * )
    * @Groups({"expense", "budget"})
    */
   private $month;
@@ -48,7 +53,12 @@ class BudgetExpense
   /**
    * @var integer Day this expense was made.
    * @ORM\Column(type="integer", nullable=true)
-   * @Assert\Range(min="1", max="31")
+   * @Assert\Range(
+   *   min="1",
+   *   max="31",
+   *   minMessage="budget_expense.day.invalid",
+   *   maxMessage="budget_expense.day.invalid"
+   * )
    * @Groups({"expense", "budget"})
    */
   private $day;
@@ -56,7 +66,7 @@ class BudgetExpense
   /**
    * @var string Expense value
    * @ORM\Column(type="text")
-   * @Assert\NotBlank
+   * @Assert\NotBlank(message="budget_expense.value.invalid")
    * @Groups({"expense", "budget"})
    */
   private $value;

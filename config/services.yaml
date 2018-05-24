@@ -1,5 +1,5 @@
 parameters:
-  locale: 'en'
+  locale: 'pl'
   app.tenant_url: https://megawebmaster.eu.auth0.com
 
 services:

@@ -26,7 +26,6 @@ class Budget
   /**
    * @var string
    * @ORM\Column(type="string", length=50)
-   * @Assert\NotBlank
    * @Groups({"budget", "budget_year"})
    */
   private $slug;
@@ -34,7 +33,7 @@ class Budget
   /**
    * @var string Name of the budget.
    * @ORM\Column(type="string", length=50)
-   * @Assert\NotBlank
+   * @Assert\NotBlank(message="budget.name.blank")
    * @Groups("budget")
    */
   private $name;
@@ -42,7 +41,7 @@ class Budget
   /**
    * @var boolean Whether this is a default budget for the user.
    * @ORM\Column(type="boolean", options={"default": false})
-   * @Assert\NotNull
+   * @Assert\NotNull(message="budget.default.invalid")
    * @Groups("budget")
    */
   private $isDefault = false;
@@ -56,6 +55,7 @@ class Budget
   /**
    * @var string Owner's ID
    * @ORM\Column(type="string", length=50, nullable=false)
+   * @Assert\NotBlank(message="budget.owner.invalid")
    */
   private $userId;
 

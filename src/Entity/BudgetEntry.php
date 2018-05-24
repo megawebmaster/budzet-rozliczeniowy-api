@@ -32,7 +32,7 @@ class BudgetEntry
    * @var Category Category ID this entry belongs to.
    * @ORM\ManyToOne(targetEntity="Category")
    * @ORM\JoinColumn(name="category_id", referencedColumnName="id", onDelete="CASCADE")
-   * @Assert\NotBlank
+   * @Assert\NotBlank(message="budget_entry.category.invalid")
    * @Groups({"entry", "budget"})
    */
   private $category;
@@ -40,7 +40,7 @@ class BudgetEntry
   /**
    * @var integer Month this entry belongs to.
    * @ORM\Column(type="integer", nullable=true)
-   * @Assert\Range(min="1", max="12")
+   * @Assert\Range(min="1", max="12", minMessage="budget_entry.month.invalid", maxMessage="budget_entry.month.invalid")
    * @Groups({"entry", "budget"})
    */
   private $month;
@@ -48,7 +48,7 @@ class BudgetEntry
   /**
    * @var string Planned value
    * @ORM\Column(type="text", name="planned_value")
-   * @Assert\NotNull
+   * @Assert\NotNull(message="budget_entry.planned.invalid")
    * @Groups({"entry", "budget"})
    */
   private $plan = '';
@@ -56,7 +56,7 @@ class BudgetEntry
   /**
    * @var string Real value
    * @ORM\Column(type="text", name="real_value")
-   * @Assert\NotNull
+   * @Assert\NotNull(message="budget_entry.real.invalid")
    * @Groups({"entry", "budget"})
    */
   private $real = '';
@@ -64,7 +64,7 @@ class BudgetEntry
   /**
    * @var string Creator's ID
    * @ORM\Column(type="string", length=50, nullable=false)
-   * @Assert\NotBlank()
+   * @Assert\NotBlank(message="budget_entry.creator.invalid")
    */
   private $creatorId;
 
