@@ -46,8 +46,7 @@ class IrregularEntryController extends FOSRestController
    */
   public function index(BudgetYear $budgetYear)
   {
-    $repository = $this->getRepository();
-    $items = $repository->findBy(['budgetYear' => $budgetYear, 'month' => null]);
+    $items = $this->getRepository()->getIrregularEntries($budgetYear);
 
     return $this->json($items, 200, [], ['groups' => ['entry']]);
   }

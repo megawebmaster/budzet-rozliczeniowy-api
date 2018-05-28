@@ -62,6 +62,12 @@ class BudgetEntry
   private $real = '';
 
   /**
+   * @var string[] Real values per month
+   * @Groups({"entry"})
+   */
+  private $monthlyRealValues = [];
+
+  /**
    * @var string Creator's ID
    * @ORM\Column(type="string", length=50, nullable=false)
    * @Assert\NotBlank(message="budget_entry.creator.invalid")
@@ -142,5 +148,21 @@ class BudgetEntry
   public function setReal(string $real): void
   {
     $this->real = $real;
+  }
+
+  /**
+   * @return string[]
+   */
+  public function getMonthlyRealValues(): array
+  {
+    return $this->monthlyRealValues;
+  }
+
+  /**
+   * @param string[] $monthlyRealValues
+   */
+  public function setMonthlyRealValues(array $monthlyRealValues): void
+  {
+    $this->monthlyRealValues = $monthlyRealValues;
   }
 }
