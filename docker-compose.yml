@@ -7,17 +7,6 @@ services:
       MYSQL_DATABASE: budzet
     ports:
       - "3306:3306"
-    networks:
-      - application
-#  db:
-#    image: postgres:9.6-alpine
-#    environment:
-#      POSTGRES_PASSWORD: example
-#      POSTGRES_DB: budzet
-#    ports:
-#      - "5432:5432"
-#    networks:
-#      - application
   app:
     build:
       context: '.'
@@ -27,11 +16,11 @@ services:
       - db
     ports:
       - "8080:8080"
-    networks:
-      - application
     volumes:
       - .:/app
     command: 'php bin/console server:run --docroot=./private_html 0.0.0.0:8080'
 networks:
-  application:
+  default:
+    external:
+      name: budzet-rozliczeniowy
 
