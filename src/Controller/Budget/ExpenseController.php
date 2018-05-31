@@ -47,8 +47,7 @@ class ExpenseController extends FOSRestController
    */
   public function index(BudgetYear $budgetYear, int $month)
   {
-    $repository = $this->getRepository();
-    $items = $repository->findBy(['budgetYear' => $budgetYear, 'month' => $month]);
+    $items = $this->getRepository()->findBy(['budgetYear' => $budgetYear, 'month' => $month], ['id' => 'DESC']);
 
     return $this->json($items, 200, [], ['groups' => ['expense']]);
   }
