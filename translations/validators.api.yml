@@ -1,0 +1,17 @@
+---
+budget.name.blank: errors.budget.name.blank
+budget.default.invalid: errors.budget.default.invalid
+budget.owner.invalid: errors.budget.owner.invalid
+budget_entry.category.invalid: errors.entry.category.invalid
+budget_entry.month.invalid: errors.entry.month.invalid
+budget_entry.planned.invalid: errors.entry.planned.invalid
+budget_entry.real.invalid: errors.entry.real.invalid
+budget_entry.creator.invalid: errors.entry.creator.invalid
+budget_expense.category.invalid: errors.expense.category.invalid
+budget_expense.month.invalid: errors.expense.month.invalid
+budget_expense.day.invalid: errors.expense.day.invalid
+budget_expense.value.invalid: errors.expense.value.invalid
+budget_year.year.invalid: errors.budget-year.year.invalid
+budget_year.year.positive: errors.budget-year.year.positive
+category.name.invalid: errors.category.name.invalid
+category.type.invalid: errors.category.type.invalid
