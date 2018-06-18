@@ -92,7 +92,7 @@ class EntryController extends FOSRestController
     $creator = new BudgetEntryCreator($this->getRepository(), $budgetYear, $category, $user);
     $entry = $creator->findAndUpdate(
       $request->get('month'),
-      $request->get('planned', ''),
+      $request->get('plan', ''),
       $request->get('real', '')
     );
     $errors = $this->validator->validate($entry);
