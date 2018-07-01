@@ -18,7 +18,7 @@ services:
       - "8080:8080"
     volumes:
       - .:/app
-    command: 'php bin/console server:run --docroot=./private_html 0.0.0.0:8080'
+    command: 'php bin/console server:run --docroot=./public_html 0.0.0.0:8080'
 networks:
   default:
     external:
