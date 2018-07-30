@@ -7,6 +7,8 @@ services:
       MYSQL_DATABASE: budzet
     ports:
       - "3306:3306"
+    volumes:
+      - budzet-db:/var/lib/mysql
   app:
     build:
       context: '.'
@@ -19,8 +21,6 @@ services:
     volumes:
       - .:/app
     command: 'php bin/console server:run --docroot=./public_html 0.0.0.0:8080'
-networks:
-  default:
-    external:
-      name: budzet-rozliczeniowy
-
+volumes:
+  budzet-db:
+    external: true
