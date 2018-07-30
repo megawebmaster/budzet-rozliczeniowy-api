@@ -94,7 +94,7 @@ class BudgetController extends FOSRestController
   }
 
   /**
-   * @Route("/budgets/{budget_id}", methods={"PATCH"}, name="update_budget")
+   * @Route("/budgets/{budget_slug}", methods={"PATCH"}, name="update_budget")
    * @param Budget $budget
    * @param Request $request
    * @return JsonResponse
