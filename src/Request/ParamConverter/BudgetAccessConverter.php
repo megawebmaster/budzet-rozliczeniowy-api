@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace App\Request\ParamConverter;
 
-use App\Entity\Budget;
-use App\Repository\BudgetRepository;
+use App\Entity\BudgetAccess;
+use App\Repository\BudgetAccessRepository;
 use App\Security\User\Auth0User;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
@@ -12,7 +12,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Request\ParamConverter\ParamConverterInte
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
-class BudgetConverter implements ParamConverterInterface
+class BudgetAccessConverter implements ParamConverterInterface
 {
   /** @var ManagerRegistry */
   private $registry;
@@ -47,21 +47,12 @@ class BudgetConverter implements ParamConverterInterface
     }
     /** @var Auth0User $user */
     $user = $token->getUser();
-    $budgetId = $request->get('budget_id');
     $budgetSlug = $request->get('budget_slug');
     $em = $this->registry->getManager();
-    /** @var BudgetRepository $repository */
-    $repository = $em->getRepository(Budget::class);
+    /** @var BudgetAccessRepository $repository */
+    $repository = $em->getRepository(BudgetAccess::class);
     $name = $configuration->getName();
-
-    if($budgetId !== null)
-    {
-      $object = $repository->findForUser($user, ['id' => $budgetId]);
-    }
-    else
-    {
-      $object = $repository->findForUser($user, ['bs.slug' => $budgetSlug]);
-    }
+    $object = $repository->findOneBy(['slug' => $budgetSlug, 'userId' => $user->getId()]);
 
     if(!$object)
     {
@@ -81,6 +72,6 @@ class BudgetConverter implements ParamConverterInterface
    */
   public function supports(ParamConverter $configuration)
   {
-    return $configuration->getClass() === Budget::class;
+    return $configuration->getClass() === BudgetAccess::class;
   }
 }

@@ -5,7 +5,8 @@ namespace App\Controller;
 
 use App\Controller\Traits\ErrorRenderTrait;
 use App\Entity\Budget;
-use App\Repository\BudgetRepository;
+use App\Entity\BudgetAccess;
+use App\Repository\BudgetAccessRepository;
 use App\Security\User\Auth0User;
 use Cocur\Slugify\SlugifyInterface;
 use Doctrine\Common\Persistence\ObjectRepository;
@@ -46,14 +47,17 @@ class BudgetController extends FOSRestController
     if (empty($budgets)) {
       $budget = new Budget();
       $budget->setUserId($user->getId());
-      $budget->setName('Domowy');
-      $budget->setSlug('domowy');
-      $budget->setIsDefault(true);
+      $access = new BudgetAccess();
+      $access->setName('Domowy');
+      $access->setSlug('domowy');
+      $access->setIsDefault(true);
+      $budget->addAccess($access);
 
       $this->getDoctrine()->getManager()->persist($budget);
+      $this->getDoctrine()->getManager()->persist($access);
       $this->getDoctrine()->getManager()->flush();
 
-      $budgets = [$budget];
+      $budgets = [$access];
     }
 
     return $this->json($budgets, 200, [], ['groups' => ['budget']]);
@@ -70,67 +74,66 @@ class BudgetController extends FOSRestController
     $user = $this->getUser();
     $name = $request->get('name');
     $slug = $this->slugify->slugify($name);
-    $budget = $this->getRepository()->findOneByOrNew([
+    $access = $this->getRepository()->findOneByOrNew($user, [
       'slug' => $slug,
-      'userId' => $user->getId(),
     ]);
 
-    $budget->setName($name);
-    $budget->setSlug($slug);
-    $budget->setIsDefault($request->get('make_default') ? true : false);
-    $budget->setUserId($user->getId());
+    $access->setName($name);
+    $access->setSlug($slug);
+    $access->setIsDefault($request->get('make_default') ? true : false);
+    $access->setUserId($user->getId());
 
-    $errors = $this->validator->validate($budget);
+    $errors = $this->validator->validate($access);
 
     if(count($errors) > 0)
     {
       return $this->renderErrors($errors);
     }
 
-    $this->getDoctrine()->getManager()->persist($budget);
+    $this->getDoctrine()->getManager()->persist($access);
     $this->getDoctrine()->getManager()->flush();
 
-    return $this->json($budget, 201, [], ['groups' => ['budget']]);
+    return $this->json($access, 201, [], ['groups' => ['budget']]);
   }
 
   /**
    * @Route("/budgets/{budget_slug}", methods={"PATCH"}, name="update_budget")
-   * @param Budget $budget
+   * @param BudgetAccess $access
    * @param Request $request
    * @return JsonResponse
    */
-  public function update(Budget $budget, Request $request)
+  public function update(BudgetAccess $access, Request $request)
   {
     $name = $request->get('name');
     if($name)
     {
       $slug = $this->slugify->slugify($name);
-      $budget->setName($name);
-      $budget->setSlug($slug);
+      $access->setName($name);
+      $access->setSlug($slug);
     }
     $isDefault = $request->get('make_default');
     if($isDefault !== null)
     {
-      $budget->setIsDefault($isDefault ? true : false);
+      $access->setIsDefault($isDefault ? true : false);
     }
-    $errors = $this->validator->validate($budget);
+    $errors = $this->validator->validate($access);
 
     if(count($errors) > 0)
     {
       return $this->renderErrors($errors);
     }
 
-    $this->getDoctrine()->getManager()->persist($budget);
+    $this->getDoctrine()->getManager()->persist($access);
     $this->getDoctrine()->getManager()->flush();
 
-    return $this->json($budget, 200, [], ['groups' => ['budget']]);
+    return $this->json($access, 200, [], ['groups' => ['budget']]);
   }
 
   /**
-   * @return BudgetRepository
+   * @return BudgetAccessRepository
    */
   private function getRepository(): ObjectRepository
   {
-    return $this->getDoctrine()->getRepository(Budget::class);
+    return $this->getDoctrine()->getRepository(BudgetAccess::class);
   }
 }

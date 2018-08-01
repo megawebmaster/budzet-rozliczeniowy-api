@@ -59,9 +59,15 @@ class Budget
    */
   private $userId;
 
+  /**
+   * @ORM\OneToMany(targetEntity="BudgetAccess", mappedBy="budget", orphanRemoval=true)
+   */
+  private $accesses;
+
   public function __construct()
   {
     $this->categories = new ArrayCollection();
+    $this->accesses = new ArrayCollection();
   }
 
   /**
@@ -158,5 +164,39 @@ class Budget
   public function setCategories(array $categories): void
   {
     $this->categories = $categories;
+  }
+
+  /**
+   * @return Collection|BudgetAccess[]
+   */
+  public function getAccesses(): Collection
+  {
+    return $this->accesses;
+  }
+
+  public function addAccess(BudgetAccess $access): self
+  {
+    if(!$this->accesses->contains($access))
+    {
+      $this->accesses[] = $access;
+      $access->setBudget($this);
+    }
+
+    return $this;
+  }
+
+  public function removeAccess(BudgetAccess $access): self
+  {
+    if($this->accesses->contains($access))
+    {
+      $this->accesses->removeElement($access);
+      // set the owning side to null (unless already changed)
+      if($access->getBudget() === $this)
+      {
+        $access->setBudget(null);
+      }
+    }
+
+    return $this;
   }
 }
