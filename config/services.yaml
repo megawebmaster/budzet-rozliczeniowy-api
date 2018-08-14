@@ -1,6 +1,7 @@
 parameters:
   locale: 'api'
-  app.tenant_url: https://megawebmaster.eu.auth0.com
+  app.tenant_url: '%env(APP_TENANT_URL)%'
+  app.url: '%env(APP_URL)%'
 
 services:
   _defaults:

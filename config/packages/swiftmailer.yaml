@@ -1,0 +1,2 @@
+swiftmailer:
+    transport: expertcoder_swift_mailer.send_grid
