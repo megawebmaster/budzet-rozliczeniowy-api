@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <style type="text/css">
+        div.background {
+            background-color: #f9fafb;
+            padding: 1em 0;
+        }
+        div.content {
+            border-radius: .28571429em;
+            border: 1px solid rgba(34,36,38,.15);
+            background: #fff;
+            width: 650px;
+            margin: 1em auto;
+            padding: 0 1em 1em;
+        }
+        h3 {
+            font-size: 1.28571429em;
+            line-height: 1.28571429em;
+            color: rgba(0,0,0,.85);
+            border-bottom: 1px solid rgba(34,36,38,.15);
+        }
+        p {
+            color: rgba(0,0,0,.87);
+        }
+        div.content a[href] {
+            color: rgba(0,0,0,.87);
+        }
+        p.confirm {
+            text-align: center;
+            margin-bottom: .25em;
+        }
+        div.confirm {
+            text-align: center;
+        }
+        div.confirm a {
+            display: inline-block;
+            font-size: 1em;
+            font-weight: 700;
+            line-height: 1em;
+            background-color: #21ba45;
+            color: #fff;
+            padding: .78571429em 1.5em .78571429em;
+            text-shadow: none;
+            text-decoration: none;
+            border: 1px solid rgba(34, 36, 38, 0.15);
+            border-radius: .28571429em;
+        }
+        div.confirm a:hover {
+            background-color: #16ab39;
+        }
+        p.help {
+            color: #a9b3bc;
+            font-size: .85em;
+            text-align: center;
+            margin-top: .25em;
+        }
+        p.help a {
+            color: #a9b3bc;
+        }
+        div.warning {
+            font-size: 1em;
+            padding: 1em 1.5em;
+            margin: 1em 0;
+            line-height: 1.4285em;
+            border-radius: .28571429em;
+            border: 1px solid #c9ba9b;
+            background-color: #fffaf3;
+            color: #573a08;
+        }
+        div.warning p {
+            color: #573a08;
+            margin: 0;
+        }
+        div.warning h4 {
+            font-size: 1.07142857em;
+            color: #573a08;
+            margin: 0 0 .5em;
+        }
+        div.footer {
+            margin-top: 1.5em;
+            border-top: 1px solid rgba(34,36,38,.15);
+            padding-top: 1em;
+        }
+        div.footer p {
+            margin: 0;
+        }
+        div.footer p.app-name {
+            color: #a9b3bc;
+        }
+    </style>
+</head>
+<body>
+<div class="background">
+    <div class="content">
+        <h3>{% trans %}Hi there!{% endtrans %}</h3>
+        <p><strong>{% trans %}%email% shared a budget with you.{% endtrans %}</strong></p>
+        <p class="confirm">{% trans %}Now you need to confirm your access and name the budget:{% endtrans %}</p>
+        <div class="confirm">
+            <a href="{{ link }}">{% trans %}Confirm your access{% endtrans %}</a>
+        </div>
+        <p class="help">{% trans %}Or copy this address to your browser: %link%{% endtrans %}</p>
+        <div class="warning">
+            <h4>{% trans %}Remember{% endtrans %}</h4>
+            <p>
+                {% trans %}You need to have an encryption password to see the budget.{% endtrans %}
+                {% trans %}You should have received it from %email%, i.e. via SMS or in person.{% endtrans %}
+            </p>
+        </div>
+        <div class="footer">
+            <p>{% trans %}See you in the app!{% endtrans %}</p>
+            <p class="app-name">SimplyBudget.it</p>
+        </div>
+    </div>
+</div>
+</body>
+</html>

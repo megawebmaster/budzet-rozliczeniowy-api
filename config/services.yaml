@@ -1,5 +1,5 @@
 parameters:
-  locale: 'api'
+  locale: 'pl'
   app.tenant_url: '%env(APP_TENANT_URL)%'
   app.url: '%env(APP_URL)%'
 

@@ -16,7 +16,7 @@ class BudgetAccess
    * @ORM\Id()
    * @ORM\GeneratedValue()
    * @ORM\Column(type="integer")
-   * @Groups("budget")
+   * @Groups({"budget","budget_access"})
    */
   private $id;
 
@@ -28,8 +28,7 @@ class BudgetAccess
 
   /**
    * @ORM\Column(type="string", length=255, nullable=true)
-   * @Assert\NotBlank(message="budget.owner.invalid")
-   * @Groups("budget")
+   * @Groups({"budget","budget_access"})
    */
   private $userId;
 
@@ -55,9 +54,16 @@ class BudgetAccess
 
   /**
    * @ORM\Column(type="text", nullable=true)
-   * @Groups("budget")
+   * @Groups({"budget","budget_access"})
    */
   private $abilities;
+
+  /**
+   * @var string Recipient for verification
+   * @ORM\Column(type="text", name="recipient")
+   * @Groups({"budget", "budget_access"})
+   */
+  private $recipient;
 
   public function getId()
   {

@@ -116,6 +116,11 @@ class BudgetController extends FOSRestController
     {
       $access->setIsDefault($isDefault ? true : false);
     }
+    $recipient = $request->get('recipient');
+    if($recipient)
+    {
+      $access->setRecipient($recipient);
+    }
     $errors = $this->validator->validate($access);
 
     if(count($errors) > 0)
