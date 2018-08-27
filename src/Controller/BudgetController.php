@@ -47,10 +47,15 @@ class BudgetController extends FOSRestController
     if (empty($budgets)) {
       $budget = new Budget();
       $budget->setUserId($user->getId());
+      $budget->setName('Domowy');
+      $budget->setSlug('domowy');
+      $budget->setIsDefault(true);
       $access = new BudgetAccess();
       $access->setName('Domowy');
       $access->setSlug('domowy');
       $access->setIsDefault(true);
+      $access->setUserId($user->getId());
+      $access->setRecipient('');
       $budget->addAccess($access);
 
       $this->getDoctrine()->getManager()->persist($budget);

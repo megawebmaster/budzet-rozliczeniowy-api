@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace App\Controller\Budget;
 
 use App\Controller\Traits\ErrorRenderTrait;
-use App\Entity\Budget;
+use App\Entity\BudgetAccess;
 use App\Entity\Category;
 use App\Repository\CategoryRepository;
 use App\Security\User\Auth0User;
@@ -35,21 +35,26 @@ class CategoryController extends FOSRestController
   /**
    * @Route("/budgets/{budget_slug}/categories", name="categories", methods={"GET"})
    * @ParamConverter("budget")
-   * @param Budget $budget
+   * @param BudgetAccess $access
    * @return JsonResponse
    */
-  public function index(Budget $budget)
+  public function index(BudgetAccess $access)
   {
-    return $this->json($this->getRepository()->findBy(['budget' => $budget]), 200, [], ['groups' => ['category']]);
+    return $this->json(
+      $this->getRepository()->findBy(['budget' => $access->getBudget()]),
+      200,
+      [],
+      ['groups' => ['category']]
+    );
   }
 
   /**
    * @Route("/budgets/{budget_slug}/categories", methods={"POST"}, name="new_category")
-   * @param Budget $budget
+   * @param BudgetAccess $access
    * @param Request $request
    * @return JsonResponse
    */
-  public function create(Budget $budget, Request $request)
+  public function create(BudgetAccess $access, Request $request)
   {
     /** @var Auth0User $user */
     $user = $this->getUser();
@@ -57,7 +62,7 @@ class CategoryController extends FOSRestController
     $category = new Category();
     $category->setName($request->get('name'));
     $category->setType($request->get('type'));
-    $category->setBudget($budget);
+    $category->setBudget($access->getBudget());
     $category->setCreatorId($user->getId());
     $category->setDeletedAt(null);
 

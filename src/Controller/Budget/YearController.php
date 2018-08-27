@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace App\Controller\Budget;
 
-use App\Entity\Budget;
+use App\Entity\BudgetAccess;
 use App\Entity\BudgetYear;
 use App\Repository\BudgetYearRepository;
 use Doctrine\Common\Persistence\ObjectRepository;
@@ -15,30 +15,30 @@ class YearController extends Controller
 {
   /**
    * @Route("/budgets/{budget_slug}", name="budget_years", methods={"GET"})
-   * @param Budget $budget
+   * @param BudgetAccess $access
    * @return JsonResponse
    */
-  public function index(Budget $budget)
+  public function index(BudgetAccess $access)
   {
-    return $this->json($this->getRepository()->getAvailableYears($budget));
+    return $this->json($this->getRepository()->getAvailableYears($access->getBudget()));
   }
 
   /**
    * @Route("/budgets/{budget_slug}/{year}", name="budget_year", methods={"GET"}, requirements={"year": "\d{4}"})
-   * @param Budget $budget
+   * @param BudgetAccess $access
    * @param int $year
    * @return JsonResponse
    */
-  public function show(Budget $budget, int $year)
+  public function show(BudgetAccess $access, int $year)
   {
     $repository = $this->getRepository();
-    $budgetYear = $repository->findOneBy(['year' => $year, 'budget' => $budget]);
+    $budgetYear = $repository->findOneBy(['year' => $year, 'budget' => $access->getBudget()]);
 
     if(!$budgetYear)
     {
       $budgetYear = new BudgetYear();
       $budgetYear->setYear($year);
-      $budgetYear->setBudget($budget);
+      $budgetYear->setBudget($access->getBudget());
       $this->getDoctrine()->getManager()->persist($budgetYear);
       $this->getDoctrine()->getManager()->flush();
     }

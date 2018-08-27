@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace App\Request\ParamConverter;
 
 use App\Entity\Budget;
+use App\Entity\BudgetAccess;
 use App\Entity\BudgetYear;
 use App\Security\User\Auth0User;
 use Doctrine\Common\Persistence\ManagerRegistry;
@@ -96,7 +97,7 @@ class BudgetYearConverter implements ParamConverterInterface
 
     if(($id = $request->get('budget_id')) !== null)
     {
-      $criteria['id'] = $id;
+      $criteria['budget_id'] = $id;
     }
     else if(($slug = $request->get('budget_slug')) !== null)
     {
@@ -108,9 +109,9 @@ class BudgetYearConverter implements ParamConverterInterface
     }
 
     $em = $this->registry->getManager();
-    $budgetRepository = $em->getRepository(Budget::class);
+    $budgetRepository = $em->getRepository(BudgetAccess::class);
     /** @var Budget $budget */
-    $budget = $budgetRepository->findOneBy($criteria);
+    $budget = $budgetRepository->findOneBy($criteria)->getBudget();
 
     return $budget;
   }
