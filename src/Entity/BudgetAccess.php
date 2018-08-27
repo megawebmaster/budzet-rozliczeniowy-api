@@ -21,7 +21,7 @@ class BudgetAccess
   private $id;
 
   /**
-   * @ORM\ManyToOne(targetEntity="App\Entity\Budget", inversedBy="accesses")
+   * @ORM\ManyToOne(targetEntity="App\Entity\Budget", inversedBy="accesses", fetch="EAGER")
    * @ORM\JoinColumn(nullable=false)
    */
   private $budget;
@@ -92,6 +92,14 @@ class BudgetAccess
     $this->userId = $userId;
 
     return $this;
+  }
+
+  /**
+   * @Groups({"budget", "budget_access"})
+   */
+  public function getOwnerId()
+  {
+    return $this->getBudget()->getUserId();
   }
 
   public function getRecipient(): ?string

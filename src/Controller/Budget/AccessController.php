@@ -43,12 +43,12 @@ class AccessController extends FOSRestController
 
   /**
    * @Route("/budgets/{budget_slug}/accesses", name="budget_access", methods={"GET"})
-   * @param Budget $budget
+   * @param BudgetAccess $access
    * @return JsonResponse
    */
-  public function index(Budget $budget)
+  public function index(BudgetAccess $access)
   {
-    $accesses = $this->getRepository()->findBy(['budget' => $budget]);
+    $accesses = $this->getRepository()->findBy(['budget' => $access->getBudget()]);
 
     return $this->json($accesses, 200, [], ['groups' => ['budget_access']]);
   }
@@ -56,32 +56,32 @@ class AccessController extends FOSRestController
   /**
    * @Route("/budgets/{budget_slug}/accesses", methods={"POST"}, name="new_budget_access")
    * @param Request $request
-   * @param Budget $budget
+   * @param BudgetAccess $access
    * @param \Swift_Mailer $mailer
    * @return JsonResponse
    */
-  public function create(Request $request, Budget $budget, \Swift_Mailer $mailer)
+  public function create(Request $request, BudgetAccess $access, \Swift_Mailer $mailer)
   {
     /** @var Auth0User $user */
     $user = $this->getUser();
     list($username) = explode('@', $user->getUsername());
     $simplifiedEmail = $username[0].'…'.$username[strlen($username)-1];
 
-    $access = new BudgetAccess();
-    $access->setBudget($budget);
-    $access->setRecipient($request->get('recipient'));
-    $access->setName($this->translator->trans('Shared budget (%name%)', ['%name%' => $simplifiedEmail]));
-    $access->setSlug($this->slugify->slugify($access->getName()));
-    $access->setIsDefault(false);
+    $newAccess = new BudgetAccess();
+    $newAccess->setBudget($access->getBudget());
+    $newAccess->setRecipient($request->get('recipient'));
+    $newAccess->setName($this->translator->trans('Shared budget (%name%)', ['%name%' => $simplifiedEmail]));
+    $newAccess->setSlug($this->slugify->slugify($newAccess->getName()));
+    $newAccess->setIsDefault(false);
 
-    $errors = $this->validator->validate($access);
+    $errors = $this->validator->validate($newAccess);
 
     if(count($errors) > 0)
     {
       return $this->renderErrors($errors);
     }
 
-    $this->getDoctrine()->getManager()->persist($access);
+    $this->getDoctrine()->getManager()->persist($newAccess);
     $this->getDoctrine()->getManager()->flush();
 
     try
@@ -95,7 +95,7 @@ class AccessController extends FOSRestController
             'emails/budget_shared.html.twig',
             [
               'email' => $user->getUsername(),
-              'link' => $this->container->getParameter('app.url').'/budget/shared/'.$access->getId()
+              'link' => $this->container->getParameter('app.url').'/budget/shared/'.$newAccess->getId()
             ]
           ),
           'text/html'
@@ -104,19 +104,19 @@ class AccessController extends FOSRestController
 
       if($mailer->send($message) !== 1)
       {
-        $this->getDoctrine()->getManager()->remove($access);
+        $this->getDoctrine()->getManager()->remove($newAccess);
         $this->getDoctrine()->getManager()->flush();
 
         return $this->json(['error' => 'errors.budget-share.failure'], 500);
       }
     } catch(\Exception $e) {
-      $this->getDoctrine()->getManager()->remove($access);
+      $this->getDoctrine()->getManager()->remove($newAccess);
       $this->getDoctrine()->getManager()->flush();
 
       return $this->json(['error' => 'errors.budget-share.invalid-email'], 500);
     }
 
-    return $this->json($access, 201, [], ['groups' => ['budget_access']]);
+    return $this->json($newAccess, 201, [], ['groups' => ['budget_access']]);
   }
 
   /**
