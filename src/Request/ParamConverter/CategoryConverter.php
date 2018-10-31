@@ -65,11 +65,6 @@ class CategoryConverter implements ParamConverterInterface
       return false;
     }
 
-    if($object->getCreatorId() !== $user->getId())
-    {
-      return false;
-    }
-
     $request->attributes->set($name, $object);
 
     return true;
