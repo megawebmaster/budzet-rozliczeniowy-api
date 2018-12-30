@@ -52,7 +52,7 @@ class BudgetYearConverter implements ParamConverterInterface
     $em = $this->registry->getManager();
     $name = $configuration->getName();
     $repository = $em->getRepository(BudgetYear::class);
-    $object = $repository->findOneBy(['budget' => $budget]);
+    $object = $repository->findOneBy(['budget' => $budget, 'year' => $year]);
 
     if(!$object)
     {
