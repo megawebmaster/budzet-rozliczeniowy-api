@@ -56,8 +56,6 @@ class BudgetEntryRepository extends ServiceEntityRepository
     {
       $id = $budgetYear->getId();
       $irregularIds = join(',', $ids);
-      $now = new \DateTime();
-      $date = $now->format('Y').'-01-01';
 
       $averagesQuery = <<<SQL
 SELECT d.category_id, d.real_value
@@ -65,8 +63,7 @@ FROM budget_entry d
 LEFT JOIN budget_year db ON db.id = d.budget_year_id
 WHERE d.budget_year_id = '$id' 
   AND d.real_value != ''
-  AND d.category_id IN ($irregularIds) 
-  AND STR_TO_DATE(CONCAT(db.year,'-',d.month,'-01'), '%Y-%m-%d') >= '$date'
+  AND d.category_id IN ($irregularIds)
 SQL;
 
       $mapping = new ResultSetMapping();
