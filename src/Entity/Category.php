@@ -16,7 +16,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  */
 class Category
 {
-  const TYPES = ['expense', 'income', 'irregular'];
+  const TYPES = ['expense', 'income', 'irregular', 'saving'];
 
   /**
    * @var integer
