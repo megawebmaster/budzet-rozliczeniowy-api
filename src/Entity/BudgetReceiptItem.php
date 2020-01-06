@@ -23,7 +23,7 @@ class BudgetReceiptItem
 
   /**
    * @var BudgetReceipt Receipt this item belongs to.
-   * @ORM\ManyToOne(targetEntity="BudgetReceipt", inversedBy="items")
+   * @ORM\ManyToOne(targetEntity="BudgetReceipt", inversedBy="items", fetch="LAZY")
    */
   private $receipt;
 

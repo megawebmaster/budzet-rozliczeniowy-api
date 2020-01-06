@@ -21,8 +21,7 @@ class BudgetEntryRepository extends ServiceEntityRepository
   {
     $entry = $this->findOneBy($criteria, $orderBy);
 
-    if(!$entry)
-    {
+    if ( ! $entry) {
       $entry = new BudgetEntry();
     }
 
@@ -32,16 +31,20 @@ class BudgetEntryRepository extends ServiceEntityRepository
   public function getIrregularEntries(BudgetYear $budgetYear)
   {
     /** @var BudgetEntry[] $results */
-    $results = $this->findBy(['budgetYear' => $budgetYear, 'month' => null]);
-    $monthlyValues = $this->getMonthlyEntries($budgetYear, array_map(function ($entry){
-      /** @var BudgetEntry $entry */
-      return $entry->getCategory()->getId();
-    }, $results));
+    $results       = $this->findBy(['budgetYear' => $budgetYear, 'month' => null]);
+    $monthlyValues = $this->getMonthlyEntries(
+      $budgetYear,
+      array_map(
+        function ($entry) {
+          /** @var BudgetEntry $entry */
+          return $entry->getCategory()->getId();
+        },
+        $results
+      )
+    );
 
-    foreach($results as $result)
-    {
-      if(isset($monthlyValues[$result->getCategory()->getId()]))
-      {
+    foreach ($results as $result) {
+      if (isset($monthlyValues[$result->getCategory()->getId()])) {
         $result->setMonthlyRealValues($monthlyValues[$result->getCategory()->getId()]);
       }
     }
@@ -52,9 +55,8 @@ class BudgetEntryRepository extends ServiceEntityRepository
 
   private function getMonthlyEntries(BudgetYear $budgetYear, array $ids): array
   {
-    try
-    {
-      $id = $budgetYear->getId();
+    try{
+      $id           = $budgetYear->getId();
       $irregularIds = join(',', $ids);
 
       $averagesQuery = <<<SQL
@@ -71,14 +73,12 @@ SQL;
       $mapping->addScalarResult('category_id', 'category_id');
 
       $results = $this->getEntityManager()
-        ->createNativeQuery($averagesQuery, $mapping)
-        ->getResult(AbstractQuery::HYDRATE_ARRAY);
+                      ->createNativeQuery($averagesQuery, $mapping)
+                      ->getResult(AbstractQuery::HYDRATE_ARRAY);
 
       $values = [];
-      foreach($results as $result)
-      {
-        if(!isset($values[$result['category_id']]))
-        {
+      foreach ($results as $result) {
+        if ( ! isset($values[$result['category_id']])) {
           $values[$result['category_id']] = [];
         }
 
@@ -86,9 +86,7 @@ SQL;
       }
 
       return $values;
-    }
-    catch(\Exception $e)
-    {
+    } catch (\Exception $e){
       return [];
     }
   }

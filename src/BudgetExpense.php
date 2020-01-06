@@ -1,37 +1,29 @@
 <?php
 declare(strict_types=1);
 
-namespace App\Entity;
+namespace App;
 
-use Doctrine\ORM\Mapping as ORM;
+use App\Entity\BudgetYear;
+use App\Entity\Category;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
-/**
- * @ORM\Entity(repositoryClass="App\Repository\BudgetExpenseRepository")
- */
 class BudgetExpense
 {
   /**
    * @var integer
-   * @ORM\Id
-   * @ORM\GeneratedValue
-   * @ORM\Column(type="integer")
    * @Groups({"expense", "budget"})
    */
   private $id;
 
   /**
    * @var BudgetYear Budget year this expense belongs to.
-   * @ORM\ManyToOne(targetEntity="BudgetYear", inversedBy="expenses")
    * @Groups("expense")
    */
   private $budgetYear;
 
   /**
    * @var Category
-   * @ORM\ManyToOne(targetEntity="Category")
-   * @ORM\JoinColumn(name="category_id", referencedColumnName="id", onDelete="CASCADE")
    * @Assert\NotBlank(message="budget_expense.category.invalid")
    * @Groups({"expense", "budget"})
    */
@@ -39,7 +31,6 @@ class BudgetExpense
 
   /**
    * @var integer Month this expense was made.
-   * @ORM\Column(type="integer")
    * @Assert\Range(
    *   min="1",
    *   max="12",
@@ -52,7 +43,6 @@ class BudgetExpense
 
   /**
    * @var integer Day this expense was made.
-   * @ORM\Column(type="integer", nullable=true)
    * @Assert\Range(
    *   min="1",
    *   max="31",
@@ -65,7 +55,6 @@ class BudgetExpense
 
   /**
    * @var string Expense value
-   * @ORM\Column(type="text")
    * @Assert\NotBlank(message="budget_expense.value.invalid")
    * @Groups({"expense", "budget"})
    */
@@ -73,14 +62,12 @@ class BudgetExpense
 
   /**
    * @var string Description
-   * @ORM\Column(type="text")
    * @Groups({"expense", "budget"})
    */
   private $description;
 
   /**
    * @var string Creator's ID
-   * @ORM\Column(type="string", length=50, nullable=false)
    */
   private $creatorId;
 

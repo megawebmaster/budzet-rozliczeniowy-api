@@ -112,6 +112,14 @@ class BudgetReceipt
     return $this->items;
   }
 
+  /**
+   * @param BudgetReceiptItem[] $items
+   */
+  public function setItems(array $items): void
+  {
+    $this->items = $items;
+  }
+
   public function getMonth(): ?int
   {
     return $this->month;

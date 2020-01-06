@@ -47,13 +47,6 @@ class BudgetYear
   private $entries;
 
   /**
-   * @var BudgetExpense[] List of expenses
-   * @ORM\OneToMany(targetEntity="BudgetExpense", mappedBy="budgetYear")
-   * @Groups("budget_year")
-   */
-  private $expenses;
-
-  /**
    * @var BudgetReceipt[] List of receipts
    * @ORM\OneToMany(targetEntity="BudgetReceipt", mappedBy="budgetYear")
    * @Groups("budget_year")
@@ -63,7 +56,6 @@ class BudgetYear
   public function __construct()
   {
     $this->entries = new ArrayCollection();
-    $this->expenses = new ArrayCollection();
     $this->receipts = new ArrayCollection();
   }
 
@@ -123,22 +115,6 @@ class BudgetYear
   public function setEntries(array $entries): void
   {
     $this->entries = $entries;
-  }
-
-  /**
-   * @return Collection<BudgetExpense>
-   */
-  public function getExpenses(): Collection
-  {
-    return $this->expenses;
-  }
-
-  /**
-   * @param BudgetExpense[] $expenses
-   */
-  public function setExpenses(array $expenses): void
-  {
-    $this->expenses = $expenses;
   }
 
   /**

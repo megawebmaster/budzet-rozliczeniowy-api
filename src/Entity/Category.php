@@ -23,7 +23,7 @@ class Category
    * @ORM\Id
    * @ORM\GeneratedValue
    * @ORM\Column(type="integer")
-   * @Groups({"category", "category_parent", "entry", "expense", "budget"})
+   * @Groups({"category", "category_parent", "entry", "receipt", "budget"})
    */
   private $id;
 
@@ -46,7 +46,7 @@ class Category
    * @var string Type of the category: expense, income, irregular
    * @ORM\Column(type="string")
    * @Assert\Choice(callback="getTypes", message="category.type.invalid")
-   * @Groups({"category", "category_parent", "entry", "expense", "budget"})
+   * @Groups({"category", "category_parent", "entry", "receipt", "budget"})
    * TODO: Move it back to simple "category" group - when fixed in frontend
    */
   private $type;
@@ -71,10 +71,10 @@ class Category
   private $entries;
 
   /**
-   * @var BudgetExpense[] Expenses list.
-   * @ORM\OneToMany(targetEntity="BudgetExpense", mappedBy="category")
+   * @var BudgetReceipt[] Receipts list.
+   * @ORM\OneToMany(targetEntity="BudgetReceipt", mappedBy="category")
    */
-  private $expenses;
+  private $receipts;
 
   /**
    * @var \DateTime Creation time.
@@ -118,7 +118,7 @@ class Category
   {
     $this->subcategories = new ArrayCollection();
     $this->entries = new ArrayCollection();
-    $this->expenses = new ArrayCollection();
+    $this->receipts = new ArrayCollection();
   }
 
   /**

@@ -5,10 +5,12 @@ namespace App\Controller\Budget;
 
 use App\Controller\Traits\ErrorRenderTrait;
 use App\Entity\BudgetEntry;
-use App\Entity\BudgetExpense;
+use App\BudgetExpense;
+use App\Entity\BudgetReceipt;
+use App\Entity\BudgetReceiptItem;
 use App\Entity\BudgetYear;
 use App\Entity\Category;
-use App\Repository\BudgetExpenseRepository;
+use App\Repository\BudgetReceiptRepository;
 use App\Security\User\Auth0User;
 use Doctrine\Common\Persistence\ObjectRepository;
 use FOS\RestBundle\Controller\FOSRestController;
@@ -47,7 +49,24 @@ class ExpenseController extends FOSRestController
    */
   public function index(BudgetYear $budgetYear, int $month)
   {
-    $items = $this->getRepository()->findBy(['budgetYear' => $budgetYear, 'month' => $month], ['id' => 'DESC']);
+    /** @var BudgetReceipt[] $receipts */
+    $receipts = $this->getRepository()->findBy(['budgetYear' => $budgetYear, 'month' => $month], ['id' => 'DESC']);
+    $items = [];
+    foreach ($receipts as $receipt) {
+      foreach ($receipt->getItems() as $item) {
+        /** @var BudgetReceiptItem $item */
+        $expense = new BudgetExpense();
+        $expense->setId($item->getId());
+        $expense->setBudgetYear($receipt->getBudgetYear());
+        $expense->setCategory($item->getCategory());
+        $expense->setCreatorId($item->getCreatorId());
+        $expense->setDay($receipt->getDay());
+        $expense->setDescription($item->getDescription());
+        $expense->setMonth($receipt->getMonth());
+        $expense->setValue($item->getValue());
+        $items[] = $expense;
+      }
+    }
 
     return $this->json($items, 200, [], ['groups' => ['expense']]);
   }
@@ -70,14 +89,29 @@ class ExpenseController extends FOSRestController
   {
     /** @var Auth0User $user */
     $user = $this->getUser();
+    $receipt = new BudgetReceipt();
+    $receipt->setBudgetYear($budgetYear);
+    $receipt->setMonth($month);
+    $receipt->setDay((int)$request->get('day'));
+    $receipt->setCreatorId($user->getId());
+
+    $item = new BudgetReceiptItem();
+    $item->setCategory($category);
+    $item->setCreatorId($user->getId());
+    $item->setDescription($request->get('description', ''));
+    $item->setValue($request->get('value', ''));
+    $item->setReceipt($receipt);
+
+    $receipt->setItems([$item]);
+
     $expense = new BudgetExpense();
-    $expense->setBudgetYear($budgetYear);
-    $expense->setCategory($category);
-    $expense->setMonth($month);
-    $expense->setValue($request->get('value', ''));
-    $expense->setDay((int)$request->get('day'));
-    $expense->setDescription($request->get('description', ''));
-    $expense->setCreatorId($user->getId());
+    $expense->setBudgetYear($receipt->getBudgetYear());
+    $expense->setCategory($item->getCategory());
+    $expense->setCreatorId($item->getCreatorId());
+    $expense->setDay($receipt->getDay());
+    $expense->setDescription($item->getDescription());
+    $expense->setMonth($receipt->getMonth());
+    $expense->setValue($item->getValue());
 
     $errors = $this->validator->validate($expense);
     if(count($errors) > 0)
@@ -95,8 +129,11 @@ class ExpenseController extends FOSRestController
     }
 
     $this->getDoctrine()->getManager()->persist($entry);
-    $this->getDoctrine()->getManager()->persist($expense);
+    $this->getDoctrine()->getManager()->persist($receipt);
+    $this->getDoctrine()->getManager()->persist($item);
     $this->getDoctrine()->getManager()->flush();
+
+    $expense->setId($item->getId());
 
     return $this->json($expense, 201, [], ['groups' => ['expense']]);
   }
@@ -109,43 +146,45 @@ class ExpenseController extends FOSRestController
    *   requirements={"year": "\d{4}", "month": "\d{1,2}"}
    * )
    * @ParamConverter("category", isOptional=true)
-   * @param BudgetExpense $expense
+   * @param BudgetReceiptItem $item
    * @param Category $category
    * @param Request $request
    * @return JsonResponse
    */
-  public function update(BudgetExpense $expense, Category $category, Request $request)
+  public function update(BudgetReceiptItem $item, Category $category, Request $request)
   {
+    $receipt = $item->getReceipt();
+
     if($category)
     {
-      $expense->setCategory($category);
+      $item->setCategory($category);
     }
 
     $value = $request->get('value');
     if($value)
     {
-      $expense->setValue($value);
+      $item->setValue($value);
     }
 
     $day = $request->get('day');
     if($day)
     {
-      $expense->setDay((int)$day);
+      $receipt->setDay((int)$day);
     }
 
     $description = $request->get('description');
     if($description !== null)
     {
-      $expense->setDescription($description);
+      $item->setDescription($description);
     }
 
-    $errors = $this->validator->validate($expense);
+    $errors = $this->validator->validate($item);
     if(count($errors) > 0)
     {
       return $this->renderErrors($errors);
     }
 
-    $entry = $this->getMatchingEntry($expense->getBudgetYear(), $expense->getMonth(), $category);
+    $entry = $this->getMatchingEntry($receipt->getBudgetYear(), $receipt->getMonth(), $category);
     $entry->setReal($request->get('budget_value', ''));
 
     $errors = $this->validator->validate($entry);
@@ -156,28 +195,40 @@ class ExpenseController extends FOSRestController
 
     $this->getDoctrine()->getManager()->persist($entry);
 
-    $this->getDoctrine()->getManager()->persist($expense);
+    $this->getDoctrine()->getManager()->persist($receipt);
+    $this->getDoctrine()->getManager()->persist($item);
     $this->getDoctrine()->getManager()->flush();
+
+    $expense = new BudgetExpense();
+    $expense->setId($item->getId());
+    $expense->setBudgetYear($receipt->getBudgetYear());
+    $expense->setCategory($item->getCategory());
+    $expense->setCreatorId($item->getCreatorId());
+    $expense->setDay($receipt->getDay());
+    $expense->setDescription($item->getDescription());
+    $expense->setMonth($receipt->getMonth());
+    $expense->setValue($item->getValue());
 
     return $this->json($expense, 200, [], ['groups' => ['expense']]);
   }
 
   /**
    * @Route("/budgets/{budget_slug}/{year}/expenses/{month}/{id}", methods={"DELETE"}, name="delete_budget_expense")
-   * @param BudgetExpense $expense
+   * @param BudgetReceiptItem $item
    * @param Request $request
    * @return Response
    */
-  public function delete(BudgetExpense $expense, Request $request)
+  public function delete(BudgetReceiptItem $item, Request $request)
   {
     /** @var Auth0User $user */
     $user = $this->getUser();
-    if($expense->getCreatorId() !== $user->getId())
+    if($item->getCreatorId() !== $user->getId())
     {
       return new JsonResponse(['error' => 'Invalid user ID'], 403); // TODO: Properly translate this message
     }
 
-    $entry = $this->getMatchingEntry($expense->getBudgetYear(), $expense->getMonth(), $expense->getCategory());
+    $receipt = $item->getReceipt();
+    $entry = $this->getMatchingEntry($receipt->getBudgetYear(), $receipt->getMonth(), $item->getCategory());
     $entry->setReal($request->get('budget_value', ''));
 
     $errors = $this->validator->validate($entry);
@@ -187,18 +238,18 @@ class ExpenseController extends FOSRestController
     }
 
     $this->getDoctrine()->getManager()->persist($entry);
-    $this->getDoctrine()->getManager()->remove($expense);
+    $this->getDoctrine()->getManager()->remove($item);
     $this->getDoctrine()->getManager()->flush();
 
     return new JsonResponse(['success' => true]);
   }
 
   /**
-   * @return BudgetExpenseRepository
+   * @return BudgetReceiptRepository
    */
   private function getRepository(): ObjectRepository
   {
-    return $this->getDoctrine()->getRepository(BudgetExpense::class);
+    return $this->getDoctrine()->getRepository(BudgetReceipt::class);
   }
 
   private function getMatchingEntry(BudgetYear $budgetYear, int $month, Category $category): BudgetEntry
