@@ -239,6 +239,12 @@ class ExpenseController extends FOSRestController
 
     $this->getDoctrine()->getManager()->persist($entry);
     $this->getDoctrine()->getManager()->remove($item);
+
+    $receiptItems = $receipt->getItems()->filter(function($i) use ($item) { return $i->getId() !== $item->getId(); });
+    if ($receiptItems->count() === 0) {
+      $this->getDoctrine()->getManager()->remove($receipt);
+    }
+
     $this->getDoctrine()->getManager()->flush();
 
     return new JsonResponse(['success' => true]);

@@ -23,7 +23,7 @@ class Category
    * @ORM\Id
    * @ORM\GeneratedValue
    * @ORM\Column(type="integer")
-   * @Groups({"category", "category_parent", "entry", "receipt", "budget"})
+   * @Groups({"category", "category_parent", "entry", "expense", "receipt", "budget"})
    */
   private $id;
 
@@ -46,7 +46,7 @@ class Category
    * @var string Type of the category: expense, income, irregular
    * @ORM\Column(type="string")
    * @Assert\Choice(callback="getTypes", message="category.type.invalid")
-   * @Groups({"category", "category_parent", "entry", "receipt", "budget"})
+   * @Groups({"category", "category_parent", "entry", "expense", "receipt", "budget"})
    * TODO: Move it back to simple "category" group - when fixed in frontend
    */
   private $type;

@@ -97,6 +97,14 @@ class BudgetReceiptItem
     $this->receipt = $receipt;
   }
 
+  /**
+   * @Groups({"receipt"})
+   */
+  public function getReceiptId(): int
+  {
+    return $this->receipt->getId();
+  }
+
   public function getValue(): ?string
   {
     return $this->value;

@@ -8,6 +8,7 @@ use App\Entity\BudgetReceipt;
 use App\Entity\BudgetYear;
 use App\Repository\BudgetReceiptRepository;
 use Doctrine\Common\Persistence\ObjectRepository;
+use Doctrine\ORM\AbstractQuery;
 use FOS\RestBundle\Controller\FOSRestController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
