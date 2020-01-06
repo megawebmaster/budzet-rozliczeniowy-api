@@ -57,6 +57,13 @@ class BudgetReceipt
   private $day;
 
   /**
+   * @var string Shop in which the receipt was made.
+   * @ORM\Column(type="string", nullable=true)
+   * @Groups({"receipt"})
+   */
+  private $shop;
+
+  /**
    * @var BudgetReceiptItem[] List of items
    * @ORM\OneToMany(targetEntity="BudgetReceiptItem", mappedBy="receipt", fetch="EAGER")
    * @Groups("receipt")
@@ -138,5 +145,15 @@ class BudgetReceipt
   public function setDay(?int $day): void
   {
     $this->day = $day;
+  }
+
+  public function getShop(): ?string
+  {
+    return $this->shop;
+  }
+
+  public function setShop(?string $shop): void
+  {
+    $this->shop = $shop;
   }
 }
