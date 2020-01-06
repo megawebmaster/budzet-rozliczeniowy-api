@@ -23,7 +23,7 @@ class Category
    * @ORM\Id
    * @ORM\GeneratedValue
    * @ORM\Column(type="integer")
-   * @Groups({"category", "entry", "expense", "budget"})
+   * @Groups({"category", "category_parent", "entry", "expense", "budget"})
    */
   private $id;
 
@@ -38,7 +38,7 @@ class Category
    * @var string Name of the category.
    * @ORM\Column(type="text")
    * @Assert\NotBlank(message="category.name.invalid")
-   * @Groups("category")
+   * @Groups({"category", "category_parent"})
    */
   private $name;
 
@@ -46,7 +46,7 @@ class Category
    * @var string Type of the category: expense, income, irregular
    * @ORM\Column(type="string")
    * @Assert\Choice(callback="getTypes", message="category.type.invalid")
-   * @Groups({"category", "entry", "expense", "budget"})
+   * @Groups({"category", "category_parent", "entry", "expense", "budget"})
    * TODO: Move it back to simple "category" group - when fixed in frontend
    */
   private $type;
@@ -54,7 +54,7 @@ class Category
   /**
    * @var Category Parent category.
    * @ORM\ManyToOne(targetEntity="Category", inversedBy="subcategories")
-   * @Groups("category")
+   * @Groups({"category", "category_parent"})
    */
   private $parent;
 

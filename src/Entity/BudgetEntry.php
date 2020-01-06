@@ -24,7 +24,6 @@ class BudgetEntry
   /**
    * @var BudgetYear Budget year this entry belongs to.
    * @ORM\ManyToOne(targetEntity="BudgetYear", inversedBy="entries")
-   * @Groups("entry")
    */
   private $budgetYear;
 

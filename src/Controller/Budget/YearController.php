@@ -15,6 +15,7 @@ class YearController extends Controller
 {
   /**
    * @Route("/budgets/{budget_slug}", name="budget_years", methods={"GET"})
+   * @Route("/v2/budgets/{budget_slug}", name="v2_budget_years", methods={"GET"})
    * @param BudgetAccess $access
    * @return JsonResponse
    */

@@ -37,6 +37,7 @@ class BudgetController extends FOSRestController
 
   /**
    * @Route("/budgets", name="budgets", methods={"GET"})
+   * @Route("/v2/budgets", name="v2_budgets", methods={"GET"})
    */
   public function index()
   {
