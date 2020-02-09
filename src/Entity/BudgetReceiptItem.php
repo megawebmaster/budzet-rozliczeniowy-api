@@ -32,7 +32,6 @@ class BudgetReceiptItem
    * @ORM\ManyToOne(targetEntity="Category")
    * @ORM\JoinColumn(name="category_id", referencedColumnName="id", onDelete="CASCADE")
    * @Assert\NotBlank(message="budget_receipt_item.category.invalid")
-   * @Groups({"receipt"})
    */
   private $category;
 
@@ -85,6 +84,16 @@ class BudgetReceiptItem
   public function setCategory(Category $category): void
   {
     $this->category = $category;
+  }
+
+  /**
+   * @Groups({"receipt"})
+   * @return int
+   * @noinspection PhpUnused
+   */
+  public function getCategoryId(): int
+  {
+    return $this->category->getId();
   }
 
   public function getReceipt(): ?BudgetReceipt
