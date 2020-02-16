@@ -51,7 +51,7 @@ class CategoryConverter implements ParamConverterInterface
     $name = $configuration->getName();
     $em = $this->registry->getManager();
     $value = $request->get('value');
-    $id = $request->get('category_id', $value ? $value['category_id'] : null);
+    $id = $request->get('category_id', $value && isset($value['category_id']) ? $value['category_id'] : null);
 
     if (!$id)
     {

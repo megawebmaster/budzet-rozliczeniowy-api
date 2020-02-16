@@ -57,7 +57,6 @@ class EntryController extends FOSRestController{
 	 *   name="v2_update_budget_entry",
 	 *   requirements={"year": "\d{4}", "month": "\d\d?"}
 	 * )
-	 * @ParamConverter("category")
 	 * @param BudgetYear $budgetYear
 	 * @param Category $category
 	 * @param int $month

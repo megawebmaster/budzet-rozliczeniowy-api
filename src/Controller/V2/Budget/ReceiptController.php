@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace App\Controller\V2\Budget;
 
 use App\Controller\Traits\ErrorRenderTrait;
+use App\Entity\BudgetEntry;
 use App\Entity\BudgetReceipt;
 use App\Entity\BudgetReceiptItem;
 use App\Entity\BudgetYear;
@@ -89,22 +90,19 @@ class ReceiptController extends FOSRestController
       $item->setValue($itemValue['value']);
       $item->setReceipt($receipt);
 
-      // TODO: Update correct entry
-//      $entry = $this->getMatchingEntry($budgetYear, $month, $category);
-//      $entry->setReal($request->get('budget_value', ''));
-
-//      $errors = $this->validator->validate($entry);
-//      if (count($errors) > 0) {
-//        return $this->renderErrors($errors, 'budget_');
-//      }
-
       $this->getDoctrine()->getManager()->persist($item);
-//      $this->getDoctrine()->getManager()->persist($entry);
 
       return $item;
     }, $value['items']);
 
     $receipt->setItems($items);
+
+    foreach($value['budget_values'] as $budgetValue) {
+      $entry = $this->getEntry($budgetYear, $month, $budgetValue['category_id']);
+      $entry->setReal($budgetValue['value']);
+
+      $this->getDoctrine()->getManager()->persist($entry);
+    }
 
     $errors = $this->validator->validate($receipt);
     if (count($errors) > 0) {
@@ -156,19 +154,27 @@ class ReceiptController extends FOSRestController
 
   /**
    * @Route(
-   *   "/v2/budgets/{budget_slug}/{year}/receipts/{month}/{id}",
+   *   "/v2/budgets/{budget_slug}/{year}/receipts/{month}/{receipt_id}",
    *   methods={"DELETE"},
    *   name="delete_budget_receipt",
    *   requirements={"year": "\d{4}", "month": "\d{1,2}"}
    * )
    * @param BudgetReceipt $receipt
+   * @param Request $request
    *
    * @return Response
-   * @throws \Exception
    */
-  public function delete(BudgetReceipt $receipt)
+  public function delete(BudgetReceipt $receipt, Request $request)
   {
     $em = $this->getDoctrine()->getManager();
+    $value = $request->get('value');
+    foreach($value['budget_values'] as $budgetValue) {
+      $entry = $this->getEntry($receipt->getBudgetYear(), $receipt->getMonth(), $budgetValue['category_id']);
+      $entry->setReal($budgetValue['value']);
+
+      $em->persist($entry);
+    }
+
     foreach($receipt->getItems() as $item) {
       $em->remove($item);
     }
@@ -192,5 +198,29 @@ class ReceiptController extends FOSRestController
   private function getCategoryRepository(): ObjectRepository
   {
     return $this->getDoctrine()->getRepository(Category::class);
+  }
+
+  private function getEntry(BudgetYear $budgetYear, int $month, int $categoryId): BudgetEntry
+  {
+    /** @var Category $category */
+    $category = $this->getDoctrine()->getRepository(Category::class)->find($categoryId);
+    $entry = $this->getDoctrine()->getRepository(BudgetEntry::class)->findOneBy([
+      'budgetYear' => $budgetYear,
+      'category' => $category,
+      'month' => $month
+    ]);
+
+    if(!$entry)
+    {
+      /** @var Auth0User $user */
+      $user = $this->getUser();
+      $entry = new BudgetEntry();
+      $entry->setBudgetYear($budgetYear);
+      $entry->setCategory($category);
+      $entry->setMonth($month);
+      $entry->setCreatorId($user->getId());
+    }
+
+    return $entry;
   }
 }
