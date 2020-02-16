@@ -4,16 +4,15 @@ declare(strict_types=1);
 namespace App\Request\ParamConverter;
 
 use App\Entity\Budget;
-use App\Entity\BudgetAccess;
+use App\Entity\BudgetReceipt;
 use App\Entity\BudgetYear;
-use App\Security\User\Auth0User;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Sensio\Bundle\FrameworkExtraBundle\Request\ParamConverter\ParamConverterInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
-class BudgetYearConverter implements ParamConverterInterface
+class BudgetReceiptConverter implements ParamConverterInterface
 {
   /** @var ManagerRegistry */
   private $registry;
@@ -21,7 +20,7 @@ class BudgetYearConverter implements ParamConverterInterface
   private $tokenStorage;
 
   /**
-   * BudgetYearConverter constructor.
+   * BudgetReceiptConverter constructor.
    *
    * @param TokenStorageInterface $tokenStorage
    * @param ManagerRegistry $registry
@@ -47,20 +46,25 @@ class BudgetYearConverter implements ParamConverterInterface
       return false;
     }
 
-    /** @var int $year */
+    $id = (int)$request->get('receipt_id');
     $year = (int)$request->get('year');
+    $month = (int)$request->get('month');
     $em = $this->registry->getManager();
     $name = $configuration->getName();
-    $repository = $em->getRepository(BudgetYear::class);
-    $object = $repository->findOneBy(['budget' => $budget, 'year' => $year]);
+
+    $budgetYearRepository = $em->getRepository(BudgetYear::class);
+    $budgetYear = $budgetYearRepository->findOneBy(['budget' => $budget, 'year' => $year]);
+    if($budgetYear === null)
+    {
+      return false;
+    }
+
+    $repository = $em->getRepository(BudgetReceipt::class);
+    $object = $repository->findOneBy(['budgetYear' => $budgetYear, 'month' => $month, 'id' => $id]);
 
     if(!$object)
     {
-      $object = new BudgetYear();
-      $object->setBudget($budget);
-      $object->setYear($year);
-      $em->persist($object);
-      $em->flush();
+      $request->attributes->set($name, null);
     }
 
     $request->attributes->set($name, $object);
@@ -76,6 +80,6 @@ class BudgetYearConverter implements ParamConverterInterface
    */
   public function supports(ParamConverter $configuration)
   {
-    return $configuration->getClass() === BudgetYear::class;
+    return $configuration->getClass() === BudgetReceipt::class;
   }
 }

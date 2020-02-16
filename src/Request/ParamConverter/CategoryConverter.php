@@ -50,8 +50,23 @@ class CategoryConverter implements ParamConverterInterface
     $user = $token->getUser();
     $name = $configuration->getName();
     $em = $this->registry->getManager();
+    $value = $request->get('value');
+    $id = $request->get('category_id', $value ? $value['category_id'] : null);
+
+    if (!$id)
+    {
+      if($configuration->isOptional())
+      {
+        $request->attributes->set($name, null);
+
+        return true;
+      }
+
+      return false;
+    }
+
     /** @var Category $object */
-    $object = $em->getRepository(Category::class)->find($request->get('category_id'));
+    $object = $em->getRepository(Category::class)->find($id);
 
     if(!$object)
     {

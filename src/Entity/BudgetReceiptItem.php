@@ -17,7 +17,7 @@ class BudgetReceiptItem
    * @ORM\Id
    * @ORM\GeneratedValue
    * @ORM\Column(type="integer")
-   * @Groups({"receipt"})
+   * @Groups({"receipt", "receipt_item"})
    */
   private $id;
 
@@ -39,14 +39,14 @@ class BudgetReceiptItem
    * @var string Expense value
    * @ORM\Column(type="text")
    * @Assert\NotBlank(message="budget_receipt_item.value.invalid")
-   * @Groups({"receipt"})
+   * @Groups({"receipt", "receipt_item"})
    */
   private $value;
 
   /**
    * @var string Description
    * @ORM\Column(type="text")
-   * @Groups({"receipt"})
+   * @Groups({"receipt", "receipt_item"})
    */
   private $description;
 
