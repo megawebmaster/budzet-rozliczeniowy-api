@@ -119,6 +119,43 @@ class ReceiptController extends FOSRestController
 
   /**
    * @Route(
+   *   "/v2/budgets/{budget_slug}/{year}/receipts/{month}/{receipt_id}",
+   *   methods={"PUT"},
+   *   name="update_budget_receipt",
+   *   requirements={"year": "\d{4}", "month": "\d{1,2}"}
+   * )
+   * @param BudgetReceipt $receipt
+   * @param Request $request
+   *
+   * @return JsonResponse
+   */
+  public function update(BudgetReceipt $receipt, Request $request)
+  {
+    $value = $request->get('value');
+    if($value['day'])
+    {
+      $receipt->setDay((int)$value['day']);
+    }
+
+    if($value['shop'] !== null)
+    {
+      $receipt->setShop($value['shop']);
+    }
+
+    $errors = $this->validator->validate($receipt);
+    if(count($errors) > 0)
+    {
+      return $this->renderErrors($errors);
+    }
+
+    $this->getDoctrine()->getManager()->persist($receipt);
+    $this->getDoctrine()->getManager()->flush();
+
+    return $this->json($receipt, 200, [], ['groups' => ['receipt']]);
+  }
+
+  /**
+   * @Route(
    *   "/v2/budgets/{budget_slug}/{year}/receipts/{month}/{id}",
    *   methods={"DELETE"},
    *   name="delete_budget_receipt",

@@ -33,7 +33,7 @@ class ReceiptItemController extends FOSRestController
 
   /**
    * @Route(
-   *   "/v2/budgets/{budget_slug}/{year}/receipts/{month}/{receipt_id}",
+   *   "/v2/budgets/{budget_slug}/{year}/receipts/{month}/{receipt_id}/items",
    *   methods={"POST"},
    *   name="new_budget_receipt_item",
    *   requirements={"year": "\d{4}", "month": "\d{1,2}"}
@@ -82,7 +82,64 @@ class ReceiptItemController extends FOSRestController
 
   /**
    * @Route(
-   *   "/v2/budgets/{budget_slug}/{year}/receipts/{month}/{receipt_id}/{id}",
+   *   "/v2/budgets/{budget_slug}/{year}/receipts/{month}/{receipt_id}/items/{id}",
+   *   methods={"PUT"},
+   *   name="update_budget_receipt_item",
+   *   requirements={"year": "\d{4}", "month": "\d{1,2}"}
+   * )
+   * @param BudgetReceipt $receipt
+   * @param Category $category
+   * @param BudgetReceiptItem $item
+   * @param Request $request
+   *
+   * @return JsonResponse
+   */
+  public function update(BudgetReceipt $receipt, Category $category, BudgetReceiptItem $item, Request $request)
+  {
+    if ($receipt->getItems()->indexOf($item) === false)
+    {
+      // TODO: Throw proper errors here
+      return $this->json('', 400);
+    }
+
+    $item->setCategory($category);
+    $value = $request->get('value');
+
+    if($value['value'])
+    {
+      $item->setValue($value['value']);
+    }
+
+    if($value['description'])
+    {
+      $item->setDescription($value['description']);
+    }
+
+    $errors = $this->validator->validate($item);
+    if(count($errors) > 0)
+    {
+      return $this->renderErrors($errors);
+    }
+
+//    // TODO: Update correct entry
+//    $entry = $this->getMatchingEntry($budgetYear, $month, $category);
+//    $entry->setReal($request->get('budget_value', ''));
+//
+//    $errors = $this->validator->validate($entry);
+//    if (count($errors) > 0) {
+//      return $this->renderErrors($errors, 'budget_');
+//    }
+
+    $this->getDoctrine()->getManager()->persist($item);
+//    $this->getDoctrine()->getManager()->persist($entry);
+    $this->getDoctrine()->getManager()->flush();
+
+    return $this->json($item, 200, [], ['groups' => ['receipt_item']]);
+  }
+
+  /**
+   * @Route(
+   *   "/v2/budgets/{budget_slug}/{year}/receipts/{month}/{receipt_id}/items/{id}",
    *   methods={"DELETE"},
    *   name="delete_budget_receipt_item",
    *   requirements={"year": "\d{4}", "month": "\d{1,2}"}
