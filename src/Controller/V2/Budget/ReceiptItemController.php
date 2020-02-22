@@ -111,7 +111,7 @@ class ReceiptItemController extends FOSRestController
       $item->setValue($value['value']);
     }
 
-    if($value['description'])
+    if($value['description'] !== null)
     {
       $item->setDescription($value['description']);
     }
