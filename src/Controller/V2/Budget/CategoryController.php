@@ -69,11 +69,9 @@ class CategoryController extends FOSRestController
     $category->setCreatorId($user->getId());
     $category->setDeletedAt(null);
 
-    $startedAt = new \DateTime($request->get('year').'-'.$request->get('month', '01').'-01');
-    if(!$category->getStartedAt() || $category->getStartedAt() > $startedAt)
-    {
-      $category->setStartedAt($startedAt);
-    }
+    $month = $value['type'] === 'irregular' ? '01' : $request->get('month', '01');
+    $startedAt = new \DateTime($request->get('year').'-'.$month.'-01');
+    $category->setStartedAt($startedAt);
 
     if($parentId && $category->getId() !== $parentId)
     {

@@ -80,7 +80,15 @@ class EntryController extends FOSRestController{
 			return $this->renderErrors( $errors );
 		}
 
-		$em = $this->getDoctrine()->getManager();
+    $em = $this->getDoctrine()->getManager();
+		if ($category->getType() === 'irregular' && !empty($value['plan_monthly'])) {
+      for($month = 1; $month <= 12; $month++)
+      {
+        $item = $creator->findAndUpdate($month, $value['plan_monthly']);
+        $em->persist($item);
+      }
+    }
+
 		$em->persist( $entry );
 		$em->flush();
 
