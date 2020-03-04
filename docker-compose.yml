@@ -20,7 +20,7 @@ services:
       - "8080:8080"
     volumes:
       - .:/app
-    command: 'php bin/console server:run --docroot=./public_html 0.0.0.0:8080'
+    command: 'symfony serve --document-root=./public_html --port=8080'
 volumes:
   budzet-db:
     external: true

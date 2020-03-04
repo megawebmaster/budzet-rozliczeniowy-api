@@ -7,7 +7,7 @@ use App\Entity\Budget;
 use App\Entity\BudgetAccess;
 use App\Security\User\Auth0User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Symfony\Bridge\Doctrine\RegistryInterface;
+use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
@@ -16,7 +16,7 @@ class BudgetRepository extends ServiceEntityRepository
   /** @var TokenStorageInterface */
   private $tokenStorage;
 
-  public function __construct(TokenStorageInterface $tokenStorage, RegistryInterface $registry)
+  public function __construct(TokenStorageInterface $tokenStorage, ManagerRegistry $registry)
   {
     parent::__construct($registry, Budget::class);
     $this->tokenStorage = $tokenStorage;
@@ -26,8 +26,7 @@ class BudgetRepository extends ServiceEntityRepository
   {
     $budget = $this->findOneBy($criteria, $orderBy);
 
-    if(!$budget)
-    {
+    if ( ! $budget) {
       $budget = new Budget();
     }
 
@@ -37,14 +36,12 @@ class BudgetRepository extends ServiceEntityRepository
   public function findForUser(Auth0User $user, $criteria = [])
   {
     $builder = $this->createQueryBuilder('b')
-      ->innerJoin(BudgetAccess::class, 'bs')
-      ->where('bs.userId = :userId')
-      ->setParameter('userId', $user->getId())
-    ;
+                    ->innerJoin(BudgetAccess::class, 'bs')
+                    ->where('bs.userId = :userId')
+                    ->setParameter('userId', $user->getId());
 
     $idx = 0;
-    foreach($criteria as $key => $value)
-    {
+    foreach ($criteria as $key => $value) {
       $builder->andWhere("$key = ?$idx")->setParameter($idx, $value);
       $idx += 1;
     }
@@ -54,30 +51,25 @@ class BudgetRepository extends ServiceEntityRepository
 
   /**
    * @param Request $request
+   *
    * @return Budget|null
    */
   public function getFromRequest(Request $request): ?Budget
   {
     $token = $this->tokenStorage->getToken();
-    if($token === null)
-    {
+    if ($token === null) {
       return null;
     }
 
     /** @var Auth0User $user */
-    $user = $token->getUser();
+    $user     = $token->getUser();
     $criteria = ['userId' => $user->getId()];
 
-    if(($id = $request->get('budget_id')) !== null)
-    {
+    if (($id = $request->get('budget_id')) !== null) {
       $criteria['budget_id'] = $id;
-    }
-    else if(($slug = $request->get('budget_slug')) !== null)
-    {
+    } elseif (($slug = $request->get('budget_slug')) !== null) {
       $criteria['slug'] = $slug;
-    }
-    else
-    {
+    } else {
       return null;
     }
 

@@ -18,6 +18,11 @@ RUN docker-php-ext-install pdo_mysql
 RUN pecl install 'xdebug-2.6.0'
 RUN apk del autoconf gcc g++ musl-dev libc-dev make
 RUN apk --no-cache add git
+
+# Install Symfony CLI
+RUN wget -q -O /tmp/cli.gz "https://github.com/symfony/cli/releases/download/v4.12.10/symfony_linux_amd64.gz" && \
+    gzip -d "/tmp/cli.gz" && chmod 755 "/tmp/cli" && mv /tmp/cli /usr/bin/symfony
+
 RUN mkdir /app
 RUN chown dummy /app
 WORKDIR /app

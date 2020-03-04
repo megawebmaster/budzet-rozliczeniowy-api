@@ -7,11 +7,11 @@ use App\Entity\Budget;
 use App\Entity\BudgetYear;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Collections\ArrayCollection;
-use Symfony\Bridge\Doctrine\RegistryInterface;
+use Doctrine\Persistence\ManagerRegistry;
 
 class BudgetYearRepository extends ServiceEntityRepository
 {
-  public function __construct(RegistryInterface $registry)
+  public function __construct(ManagerRegistry $registry)
   {
     parent::__construct($registry, BudgetYear::class);
   }
@@ -24,10 +24,13 @@ class BudgetYearRepository extends ServiceEntityRepository
       ->where('o.budget = :budget')
       ->setParameters(['budget' => $budget])
       ->getQuery()
-      ->execute()
-    ;
+      ->execute();
     $collection = new ArrayCollection($elements);
 
-    return $collection->map(function($item){ return $item['year']; });
+    return $collection->map(
+      function ($item) {
+        return $item['year'];
+      }
+    );
   }
 }

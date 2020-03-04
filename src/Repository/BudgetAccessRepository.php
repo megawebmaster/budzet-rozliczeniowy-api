@@ -7,7 +7,7 @@ use App\Entity\Budget;
 use App\Entity\BudgetAccess;
 use App\Security\User\Auth0User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Symfony\Bridge\Doctrine\RegistryInterface;
+use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * @method BudgetAccess|null find($id, $lockMode = null, $lockVersion = null)
@@ -17,7 +17,7 @@ use Symfony\Bridge\Doctrine\RegistryInterface;
  */
 class BudgetAccessRepository extends ServiceEntityRepository
 {
-  public function __construct(RegistryInterface $registry)
+  public function __construct(ManagerRegistry $registry)
   {
     parent::__construct($registry, BudgetAccess::class);
   }
@@ -25,10 +25,9 @@ class BudgetAccessRepository extends ServiceEntityRepository
   public function findOneByOrNew(Auth0User $user, array $criteria, array $orderBy = null): BudgetAccess
   {
     $criteria['userId'] = $user->getId();
-    $access = $this->findOneBy($criteria, $orderBy);
+    $access             = $this->findOneBy($criteria, $orderBy);
 
-    if(!$access)
-    {
+    if ( ! $access) {
       $access = new BudgetAccess();
       $budget = new Budget();
       $budget->setUserId($user->getId());
