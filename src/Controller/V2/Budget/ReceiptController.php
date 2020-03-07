@@ -97,11 +97,12 @@ class ReceiptController extends FOSRestController
 
     $receipt->setItems($items);
 
+    $em = $this->getDoctrine()->getManager();
     foreach($value['budget_values'] as $budgetValue) {
       $entry = $this->getEntry($budgetYear, $month, $budgetValue['category_id']);
       $entry->setReal($budgetValue['value']);
 
-      $this->getDoctrine()->getManager()->persist($entry);
+      $em->persist($entry);
     }
 
     $errors = $this->validator->validate($receipt);
@@ -109,10 +110,10 @@ class ReceiptController extends FOSRestController
       return $this->renderErrors($errors);
     }
 
-    $this->getDoctrine()->getManager()->persist($receipt);
-    $this->getDoctrine()->getManager()->flush();
+    $em->persist($receipt);
+    $em->flush();
 
-    return $this->json($receipt, 201, [], ['groups' => ['receipt']]);
+    return $this->json($this->getRepository()->find($receipt->getId()), 201, [], ['groups' => ['receipt']]);
   }
 
   /**
