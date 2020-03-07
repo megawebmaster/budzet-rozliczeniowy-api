@@ -77,6 +77,7 @@ class ReceiptController extends FOSRestController
 
     $value = $request->get('value');
     $receipt->setDay((int)$value['day']);
+    $receipt->setShop($value['shop']);
     $receipt->setCreatorId($user->getId());
 
     $categoryRepository = $this->getCategoryRepository();
