@@ -5,6 +5,7 @@ namespace App\Repository;
 
 use App\Entity\BudgetEntry;
 use App\Entity\BudgetYear;
+use App\Entity\Category;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\Query\ResultSetMapping;
@@ -15,6 +16,33 @@ class BudgetEntryRepository extends ServiceEntityRepository
   public function __construct(ManagerRegistry $registry)
   {
     parent::__construct($registry, BudgetEntry::class);
+  }
+
+  /**
+   * @param BudgetYear $budgetYear
+   * @param int $month
+   *
+   * @return Category[]
+   */
+  public function findEntries(BudgetYear $budgetYear, int $month)
+  {
+    $categoriesRepository = $this->getEntityManager()->getRepository(Category::class);
+
+    return $this->createQueryBuilder('be')
+//                ->leftJoin('be.budgetYear', 'by')
+//                ->leftJoin('be.category', 'c')
+                ->andWhere('be.budgetYear = :budgetYear')
+                ->andWhere('be.month = :month')
+                ->andWhere('be.category IN (:categories)')
+                ->setParameters(
+                  [
+                    'budgetYear' => $budgetYear,
+                    'month'      => $month,
+                    'categories' => $categoriesRepository->findLeafCategoryIds(),
+                  ]
+                )
+                ->getQuery()
+                ->execute();
   }
 
   public function findOneByOrNew(array $criteria, array $orderBy = null): BudgetEntry

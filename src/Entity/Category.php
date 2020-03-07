@@ -54,7 +54,7 @@ class Category
   /**
    * @var Category Parent category.
    * @ORM\ManyToOne(targetEntity="Category", inversedBy="subcategories")
-   * @Groups({"category", "category_parent"})
+   * @Groups({"category", "category_parent", "entry"})
    */
   private $parent;
 

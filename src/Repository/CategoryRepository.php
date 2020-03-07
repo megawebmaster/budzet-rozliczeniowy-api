@@ -6,6 +6,7 @@ namespace App\Repository;
 use App\Entity\Category;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\AbstractQuery;
+use Doctrine\ORM\Query;
 use Doctrine\ORM\Query\ResultSetMapping;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -34,6 +35,28 @@ class CategoryRepository extends ServiceEntityRepository
     }
 
     return $results;
+  }
+
+  public function findLeafCategoryIds()
+  {
+    return $this->createQueryBuilder('c')
+                ->select('c.id')
+                ->where('c.id NOT IN (:parents)')
+                ->setParameter('parents', $this->findNonEmptyParentCategoryIds())
+                ->getQuery()
+                ->setHydrationMode(Query::HYDRATE_SCALAR)
+                ->execute();
+  }
+
+  private function findNonEmptyParentCategoryIds()
+  {
+    return $this->createQueryBuilder('c')
+                ->select('p.id')
+                ->leftJoin('c.parent', 'p')
+                ->where('p.id IS NOT NULL')
+                ->getQuery()
+                ->setHydrationMode(Query::HYDRATE_SCALAR)
+                ->execute();
   }
 
   /**
