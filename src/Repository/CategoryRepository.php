@@ -59,6 +59,18 @@ class CategoryRepository extends ServiceEntityRepository
                 ->execute();
   }
 
+  public function findLeafIrregularCategoryIds()
+  {
+    return $this->createQueryBuilder('c')
+                ->select('c.id')
+                ->where('c.id NOT IN (:parents)')
+                ->andWhere("c.type = 'irregular'")
+                ->setParameter('parents', $this->findNonEmptyParentCategoryIds())
+                ->getQuery()
+                ->setHydrationMode(Query::HYDRATE_SCALAR)
+                ->execute();
+  }
+
   /**
    * @param int $budgetId
    *

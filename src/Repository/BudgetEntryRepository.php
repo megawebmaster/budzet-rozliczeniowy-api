@@ -29,8 +29,6 @@ class BudgetEntryRepository extends ServiceEntityRepository
     $categoriesRepository = $this->getEntityManager()->getRepository(Category::class);
 
     return $this->createQueryBuilder('be')
-//                ->leftJoin('be.budgetYear', 'by')
-//                ->leftJoin('be.category', 'c')
                 ->andWhere('be.budgetYear = :budgetYear')
                 ->andWhere('be.month = :month')
                 ->andWhere('be.category IN (:categories)')
@@ -39,6 +37,28 @@ class BudgetEntryRepository extends ServiceEntityRepository
                     'budgetYear' => $budgetYear,
                     'month'      => $month,
                     'categories' => $categoriesRepository->findLeafCategoryIds(),
+                  ]
+                )
+                ->getQuery()
+                ->execute();
+  }
+
+  /**
+   * @param BudgetYear $budgetYear
+   *
+   * @return Category[]
+   */
+  public function findIrregularEntries(BudgetYear $budgetYear)
+  {
+    $categoriesRepository = $this->getEntityManager()->getRepository(Category::class);
+
+    return $this->createQueryBuilder('be')
+                ->andWhere('be.budgetYear = :budgetYear')
+                ->andWhere('be.category IN (:categories)')
+                ->setParameters(
+                  [
+                    'budgetYear' => $budgetYear,
+                    'categories' => $categoriesRepository->findLeafIrregularCategoryIds(),
                   ]
                 )
                 ->getQuery()

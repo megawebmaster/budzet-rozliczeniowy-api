@@ -223,4 +223,9 @@ class Category
   {
     $this->averageValues = $averageValues;
   }
+
+  public function isIrregular(): bool
+  {
+    return $this->type === 'irregular';
+  }
 }

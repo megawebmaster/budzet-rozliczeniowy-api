@@ -48,12 +48,12 @@ class BudgetEntryCreator
       $entry->setCreatorId($this->user->getId());
     }
 
-    if($plan)
+    if($plan !== null)
     {
       $entry->setPlan($plan);
     }
 
-    if($real)
+    if($real !== null)
     {
       $entry->setReal($real);
     }
