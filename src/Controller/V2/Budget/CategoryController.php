@@ -61,7 +61,7 @@ class CategoryController extends FOSRestController
     /** @var Auth0User $user */
     $user = $this->getUser();
     $value = $request->get('value');
-    $parentId = $value['parent']['id'];
+    $parentId = $value['parent'] ? $value['parent']['id'] : null;
     $category = new Category();
     $category->setName($value['name']);
     $category->setType($value['type']);
