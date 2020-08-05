@@ -20,7 +20,7 @@ services:
       - "8080:8080"
     volumes:
       - .:/app
-    command: 'symfony serve --document-root=./public_html --port=8080'
+    command: 'symfony serve --document-root=./public_html --port=8080 --no-tls'
 volumes:
   budzet-db:
     external: true
