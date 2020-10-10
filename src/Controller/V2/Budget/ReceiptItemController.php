@@ -60,6 +60,7 @@ class ReceiptItemController extends FOSRestController
     $item->setCreatorId($user->getId());
     $item->setDescription($value['description']);
     $item->setValue($value['value']);
+    $item->setWebCrypto($request->get('web_crypto'));
     $item->setReceipt($receipt);
 
     foreach($value['budget_values'] as $budgetValue) {
@@ -104,6 +105,7 @@ class ReceiptItemController extends FOSRestController
 
     $em = $this->getDoctrine()->getManager();
     $item->setCategory($category);
+    $item->setWebCrypto($request->get('web_crypto'));
     $value = $request->get('value');
 
     if($value['value'])

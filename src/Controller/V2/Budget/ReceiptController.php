@@ -76,12 +76,14 @@ class ReceiptController extends FOSRestController
     $receipt->setMonth($month);
 
     $value = $request->get('value');
+    $webCrypto = $request->get('web_crypto');
     $receipt->setDay((int)$value['day']);
     $receipt->setShop($value['shop']);
     $receipt->setCreatorId($user->getId());
+    $receipt->setWebCrypto($webCrypto);
 
     $categoryRepository = $this->getCategoryRepository();
-    $items = array_map(function($itemValue) use ($receipt, $user, $categoryRepository) {
+    $items = array_map(function($itemValue) use ($receipt, $user, $categoryRepository, $webCrypto) {
       /** @var Category $category */
       $category = $categoryRepository->find($itemValue['category_id']);
       $item = new BudgetReceiptItem();
@@ -89,6 +91,7 @@ class ReceiptController extends FOSRestController
       $item->setCreatorId($user->getId());
       $item->setDescription($itemValue['description']);
       $item->setValue($itemValue['value']);
+      $item->setWebCrypto($webCrypto);
       $item->setReceipt($receipt);
 
       $this->getDoctrine()->getManager()->persist($item);
@@ -102,6 +105,7 @@ class ReceiptController extends FOSRestController
     foreach($value['budget_values'] as $budgetValue) {
       $entry = $this->getEntry($budgetYear, $month, $budgetValue['category_id']);
       $entry->setReal($budgetValue['value']);
+      $entry->setWebCrypto($webCrypto);
 
       $em->persist($entry);
     }
@@ -131,6 +135,7 @@ class ReceiptController extends FOSRestController
    */
   public function update(BudgetReceipt $receipt, Request $request)
   {
+    $receipt->setWebCrypto($request->get('web_crypto'));
     $value = $request->get('value');
     if($value['day'])
     {

@@ -104,6 +104,13 @@ class Category
   private $creatorId;
 
   /**
+   * @var boolean Whether migrated to WebCrypto
+   * @ORM\Column(type="boolean", nullable=false)
+   * @Groups({"category", "category_parent"})
+   */
+  private $webCrypto = false;
+
+  /**
    * @var string[] Values from last 12 months of expenses.
    * @Groups("category")
    */
@@ -212,6 +219,22 @@ class Category
   public function setDeletedAt(?\DateTime $deletedAt): void
   {
     $this->deletedAt = $deletedAt;
+  }
+
+  /**
+   * @return bool
+   */
+  public function isWebCrypto(): bool
+  {
+    return $this->webCrypto;
+  }
+
+  /**
+   * @param bool $webCrypto
+   */
+  public function setWebCrypto(bool $webCrypto): void
+  {
+    $this->webCrypto = $webCrypto;
   }
 
   public function getAverageValues(): array

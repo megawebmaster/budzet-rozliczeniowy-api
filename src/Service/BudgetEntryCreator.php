@@ -32,7 +32,7 @@ class BudgetEntryCreator
     $this->user = $user;
   }
 
-  public function findAndUpdate(?int $month, ?string $plan, ?string $real = null): BudgetEntry
+  public function findAndUpdate(bool $webCrypto, ?int $month, ?string $plan, ?string $real = null): BudgetEntry
   {
     $entry = $this->repository->findOneByOrNew([
       'budgetYear' => $this->budgetYear,
@@ -42,6 +42,7 @@ class BudgetEntryCreator
     $entry->setBudgetYear($this->budgetYear);
     $entry->setCategory($this->category);
     $entry->setMonth($month);
+    $entry->setWebCrypto($webCrypto);
 
     if($entry->getId() === null)
     {

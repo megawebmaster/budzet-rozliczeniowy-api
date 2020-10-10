@@ -69,11 +69,12 @@ class EntryController extends FOSRestController
   public function update(BudgetYear $budgetYear, Category $category, int $month, Request $request)
   {
     /** @var Auth0User $user */
-    $user    = $this->getUser();
-    $value   = $request->get('value');
+    $user  = $this->getUser();
+    $value = $request->get('value');
 
     $creator = new BudgetEntryCreator($this->getRepository(), $budgetYear, $category, $user);
     $entry   = $creator->findAndUpdate(
+      $request->get('web_crypto'),
       $category->isIrregular() ? null : $month,
       $value['plan'],
       $category->isIrregular() ? '' : $value['real']
@@ -87,7 +88,7 @@ class EntryController extends FOSRestController
     $em = $this->getDoctrine()->getManager();
     if ($category->isIrregular() && ! empty($value['plan_monthly'])) {
       for ($month = 1; $month <= 12; $month++) {
-        $item = $creator->findAndUpdate($month, $value['plan_monthly']);
+        $item = $creator->findAndUpdate($request->get('web_crypto'), $month, $value['plan_monthly']);
         $em->persist($item);
       }
     }

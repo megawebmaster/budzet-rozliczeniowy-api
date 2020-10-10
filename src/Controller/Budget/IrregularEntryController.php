@@ -71,7 +71,7 @@ class IrregularEntryController extends FOSRestController
     $user = $this->getUser();
     $creator = new BudgetEntryCreator($this->getRepository(), $budgetYear, $category, $user);
     $plan = $request->get('plan', '');
-    $entry = $creator->findAndUpdate(null, $plan);
+    $entry = $creator->findAndUpdate(false, null, $plan);
 
     $errors = $this->validator->validate($entry);
     if(count($errors) > 0)
@@ -85,7 +85,7 @@ class IrregularEntryController extends FOSRestController
     $plan = $request->get('plan_monthly', '');
     for($month = 1; $month <= 12; $month++)
     {
-      $item = $creator->findAndUpdate($month, $plan);
+      $item = $creator->findAndUpdate(false, $month, $plan);
 
       $errors = $this->validator->validate($item);
       if(count($errors) > 0)

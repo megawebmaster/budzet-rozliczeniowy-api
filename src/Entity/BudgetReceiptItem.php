@@ -56,6 +56,13 @@ class BudgetReceiptItem
    */
   private $creatorId;
 
+  /**
+   * @var boolean Whether migrated to WebCrypto
+   * @ORM\Column(type="boolean", nullable=false)
+   * @Groups({"receipt", "receipt_item"})
+   */
+  private $webCrypto = false;
+
   public function getId(): ?int
   {
     return $this->id;
@@ -132,5 +139,21 @@ class BudgetReceiptItem
   public function setDescription(string $description): void
   {
     $this->description = $description;
+  }
+
+  /**
+   * @return bool
+   */
+  public function isWebCrypto(): bool
+  {
+    return $this->webCrypto;
+  }
+
+  /**
+   * @param bool $webCrypto
+   */
+  public function setWebCrypto(bool $webCrypto): void
+  {
+    $this->webCrypto = $webCrypto;
   }
 }

@@ -68,6 +68,7 @@ class CategoryController extends FOSRestController
     $category->setBudget($access->getBudget());
     $category->setCreatorId($user->getId());
     $category->setDeletedAt(null);
+    $category->setWebCrypto($request->get('web_crypto'));
 
     $month = $category->isIrregular() ? '01' : $request->get('month', '01');
     $startedAt = new \DateTime($request->get('year').'-'.$month.'-01');
@@ -105,6 +106,7 @@ class CategoryController extends FOSRestController
   {
 	  $value = $request->get('value');
     $category->setName($value['name']);
+    $category->setWebCrypto($request->get('web_crypto'));
 
     $startedAt = new \DateTime($request->get('year', date('Y')).'-'.$request->get('month', date('m')).'-01');
     if(!$category->getStartedAt() || $category->getStartedAt() > $startedAt)

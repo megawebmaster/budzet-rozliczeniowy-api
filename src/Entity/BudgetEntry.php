@@ -73,6 +73,13 @@ class BudgetEntry
    */
   private $creatorId;
 
+  /**
+   * @var boolean Whether migrated to WebCrypto
+   * @ORM\Column(type="boolean", nullable=false)
+   * @Groups({"entry"})
+   */
+  private $webCrypto = false;
+
   public function getId(): ?int
   {
     return $this->id;
@@ -147,6 +154,22 @@ class BudgetEntry
   public function setReal(string $real): void
   {
     $this->real = $real;
+  }
+
+  /**
+   * @return bool
+   */
+  public function isWebCrypto(): bool
+  {
+    return $this->webCrypto;
+  }
+
+  /**
+   * @param bool $webCrypto
+   */
+  public function setWebCrypto(bool $webCrypto): void
+  {
+    $this->webCrypto = $webCrypto;
   }
 
   /**
